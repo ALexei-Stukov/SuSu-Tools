@@ -49,12 +49,6 @@ epoll.o:$(susu_epoll)susu_epoll.cpp
 initparam.o:$(susu_initparam)susu_initparam.cpp
 	$(CC) $(susu_initparam)susu_initparam.cpp -o $(TEMP)susu_initparam.o
 
-cache.o:$(susu_cache)$(CPP)
-	$(CC) $(susu_cache)$(CPP) -o $(TEMP)susu_cache.o
-
-
-
-
 #---------------------------------------------------
 #	test for some tools.
 
@@ -63,8 +57,8 @@ test-initparam:initparam.o $(TEST)test-initparam.cpp
 	cp SuSu_InitParam/example.conf ./bin/
 	./bin/test-initparam.bin ./bin/example.conf
 
-test-cache:timer.o cache.o $(TEST)test-cache.cpp
-	$(BUILD) $(TEST)test-cache.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache.bin $(LD)
+test-cache:timer.o $(TEST)test-cache.cpp
+	$(BUILD) $(TEST)test-cache.cpp $(TEMP)susu_timer.o -o $(BIN)test-cache.bin $(LD)
 	./bin/test-cache.bin
 
 test-epoll:$(TEST)test-epoll.cpp
