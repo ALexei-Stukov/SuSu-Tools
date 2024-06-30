@@ -24,15 +24,15 @@ int main(int argc,char** argv)
 	cout<<endl;
 
 	cout<<"get one param"<<endl;
-	cout<<ins->get_value("name")<<endl;
+	cout<<"return string is:"<<ins->get_value("name")<<endl;
 	cout<<endl;
 
-	cout<<"get one param to int"<<endl;
-	cout<<stoi(ins->get_value("limit"))<<endl;
+	cout<<"get one param and change it to int"<<endl;
+	cout<<"return is:"<<stoi(ins->get_value("limit"))<<endl;
 	cout<<endl;
 	
 	cout<<"get a wrong param"<<endl;
-	cout<<ins->get_value("WTF")<<endl;
+	cout<<"return string is:"<<ins->get_value("WTF")<<endl;
 	cout<<endl;
 
 
