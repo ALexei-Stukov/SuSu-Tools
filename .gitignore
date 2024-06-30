@@ -1,0 +1,4 @@
+*.bin
+*.txt
+temp_file
+bin/
