@@ -17,12 +17,23 @@ susu_initparam=./SuSu_InitParam/
 susu_epoll=./SuSu_Epoll/
 
 #---------------------------------------------------
-#	Some test bins abut template-tools.
+#	Some test bins about template-tools.
 #	Because of template,these code can't be complie to *.o.
 #	If you wan to use these template-tools,just	[  #include "path_to_the_*.hpp"  ]
 
 susu_cache=./SuSu_Cache/
 
+TEMP_FOLDER_NAME=./bin ./temp_file
+
+ifeq ($(wildcard $(TEMP_FOLDER_NAME)),)
+folder_check:
+	@echo "Creating $(TEMP_FOLDER_NAME) folder"
+	@mkdir -p $(TEMP_FOLDER_NAME)
+else
+folder_check:
+	@echo "$(TEMP_FOLDER_NAME) folder already exists"
+	#do nothing
+endif
 
 
 
@@ -32,9 +43,7 @@ all:susu-tools test-all
 
 susu-tools:timer.o 
 
-test-all:test-cache test-initparam
-
-
+test-all:test-cache test-cache-algo test-initparam
 
 #--------------------------------------------------
 #	all the .o files
@@ -65,6 +74,9 @@ test-epoll:$(TEST)test-epoll.cpp
 	$(BUILD) $(TEST)test-epoll.cpp -o $(BIN)test-epoll.bin $(LD)
 	./bin/test-epoll.bin
 
+test-cache-algo:timer.o $(TEST)test-cache-algo.cpp
+	$(BUILD) $(TEST)test-cache-algo.cpp $(TEMP)susu_timer.o -o $(BIN)test-cache-algo.bin $(LD)
+	./bin/test-cache-algo.bin
 
 
 
