@@ -88,7 +88,8 @@ long long func_with_cache()
 	{
 		int N = rand()%1000;
 		int P = rand()%1000;
-		string key = to_string(N) + ":" + to_string(P);
+		//string key = to_string(N) + ":" + to_string(P);
+		string key = to_string(N*1000+P);
 		
 		if(SUCCESS == Cache.find_key(key))
 		{	
