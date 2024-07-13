@@ -17,9 +17,9 @@ void print_time(susu_timer timer)
 	timeval ret = timer.get_difference();
 	printf("the time difference is %ld sec %ld ms %ld us\n",ret.tv_sec,ret.tv_usec/1000,ret.tv_usec%1000);
 }
-void print_cache_message(susu_cache<string>& Cache)
+void print_cache_message(susu_cache& Cache)
 {
-	cout<<"the map.size() in Cache is:"<<Cache.get_meta_store_size()<<endl;
+	//cout<<"the map.size() in Cache is:"<<Cache.get_meta_store_size()<<endl;
 	cout<<"the list.size() in Cache is:"<<Cache.get_data_store_size()<<endl;
 	cout<<endl;
 }
@@ -66,6 +66,8 @@ long long algorithm(long long N,int P)
 	return ret;
 }
 
+
+susu_cache Cache;
 long long func_without_cache()
 {
 	srand(1024);	//set random seed
@@ -74,12 +76,19 @@ long long func_without_cache()
 	{
 		int N = rand()%1000;
 		int P = rand()%1000;
-		ret += algorithm(N,P)% 123456789;
+
+		string key = to_string(N*1000+P);
+		
+		long long temp = algorithm(N,P)% 123456789;
+		ret += temp;
+		ret %= 1189467205234;
+		//Cache.add(key,temp);
+		//Cache.add_kv(std::move(key),&temp);
+
 	}
 	return ret;
 }
 
-susu_cache<long long> Cache;
 long long func_with_cache()
 {
 	srand(1024);	//set random seed
@@ -90,16 +99,20 @@ long long func_with_cache()
 		int P = rand()%1000;
 		//string key = to_string(N) + ":" + to_string(P);
 		string key = to_string(N*1000+P);
+		string k = key;
 		
-		if(SUCCESS == Cache.find_key(key))
+		if(SUCCESS == Cache.find_key(std::move(key)))
 		{	
-			ret += *(Cache.get(key))% 123456789;
+			//ret += *(Cache.get(key))% 123456789;
+			ret += *(Cache.get<long long>(std::move(k)))% 123456789;
 		}
 		else
 		{
 			long long temp = algorithm(N,P)% 123456789;
 			ret += temp;
-			Cache.add(key,temp);
+			ret %= 1189467205234;
+			//Cache.add(key,temp);
+			Cache.add<long long>(std::move(k),&temp);
 		}
 	}
 	return ret;

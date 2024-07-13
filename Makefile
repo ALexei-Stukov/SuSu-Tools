@@ -39,11 +39,11 @@ endif
 
 
 
-all:susu-tools test-all
+all:folder_check susu-tools test-all
 
-susu-tools:timer.o 
+susu-tools:timer.o epoll.o cache.o initparam.o
 
-test-all:test-cache test-cache-algo test-initparam
+test-all:folder_check test-cache test-cache-algo test-initparam
 
 #--------------------------------------------------
 #	all the .o files
@@ -55,27 +55,30 @@ epoll.o:$(susu_epoll)susu_epoll.cpp
 	$(CC) $(susu_timer)susu_timer.cpp -o $(TEMP)susu_timer.o
 
 
-initparam.o:$(susu_initparam)susu_initparam.cpp
+initparam.o:cache.o $(susu_initparam)susu_initparam.cpp
 	$(CC) $(susu_initparam)susu_initparam.cpp -o $(TEMP)susu_initparam.o
+
+cache.o:$(susu_cache)susu_cache.cpp
+	$(CC) $(susu_cache)susu_cache.cpp -o $(TEMP)susu_cache.o
 
 #---------------------------------------------------
 #	test for some tools.
 
 test-initparam:initparam.o $(TEST)test-initparam.cpp
-	$(BUILD) $(TEST)test-initparam.cpp $(TEMP)susu_initparam.o -o $(BIN)test-initparam.bin $(LD)	
+	$(BUILD) $(TEST)test-initparam.cpp $(TEMP)susu_initparam.o $(TEMP)susu_cache.o -o $(BIN)test-initparam.bin $(LD)	
 	cp SuSu_InitParam/example.conf ./bin/
 	./bin/test-initparam.bin ./bin/example.conf
 
-test-cache:timer.o $(TEST)test-cache.cpp
-	$(BUILD) $(TEST)test-cache.cpp $(TEMP)susu_timer.o -o $(BIN)test-cache.bin $(LD)
+test-cache:timer.o cache.o $(TEST)test-cache.cpp
+	$(BUILD) $(TEST)test-cache.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache.bin $(LD)
 	./bin/test-cache.bin
 
 test-epoll:$(TEST)test-epoll.cpp
 	$(BUILD) $(TEST)test-epoll.cpp -o $(BIN)test-epoll.bin $(LD)
 	./bin/test-epoll.bin
 
-test-cache-algo:timer.o $(TEST)test-cache-algo.cpp
-	$(BUILD) $(TEST)test-cache-algo.cpp $(TEMP)susu_timer.o -o $(BIN)test-cache-algo.bin $(LD)
+test-cache-algo:timer.o cache.o $(TEST)test-cache-algo.cpp
+	$(BUILD) $(TEST)test-cache-algo.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache-algo.bin $(LD)
 	./bin/test-cache-algo.bin
 
 

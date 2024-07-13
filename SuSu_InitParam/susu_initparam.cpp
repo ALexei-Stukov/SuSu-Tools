@@ -62,7 +62,7 @@ int susu_initparam::load_init_param(const char* str)  //加载参数
                 if(check)
                 {continue;}
 
-		init_param.add(key,value);
+		init_param.add<string>(key,value);
 		/*
                 if(int_param.find_key(key) != int_param_kv.end())
                 {
@@ -97,7 +97,7 @@ string susu_initparam::get_value(string key)
 {
 	if(init_param.find_key(key) != FAIL)
         {
-		return *(init_param.get(key));
+		return *(init_param.get<string>(key));
         }
 	else
 	{
@@ -107,13 +107,13 @@ string susu_initparam::get_value(string key)
 
 void susu_initparam::init_param_print()
 {
-	auto ins = init_param.get_meta_store();
+	auto ins = init_param.get_data_store();
 	
 	for(auto it = ins.begin();it != ins.end();it++)
 	{
 		std::cout<<it->first
 			<<"="
-			<<*((string*)(it->second->location->data))
+			<<*((string*)(it->second->data))
 			<<std::endl;
 	}
 }

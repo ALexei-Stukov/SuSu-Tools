@@ -36,7 +36,7 @@ public:
     };
 
 private:
-    susu_cache<string> init_param;
+    susu_cache init_param;
     susu_initparam();
     ~susu_initparam();
 };

@@ -35,17 +35,6 @@ using std::function;
     
 namespace susu_tools{
 
-	//打开一个文件描述符-非网络
-	//关闭一个文件描述符-非网络
-	//注册一个文件描述符
-	//移除一个文件描述符
-	//对一个描述符读写	
-
-//class susu_epoll_server{
-//};
-//class susu_epoll_client{
-//};
-
 class susu_epoll{
 public:
         susu_epoll(int limit)
@@ -106,10 +95,32 @@ public:
 	}
 
 	template<typename T,class...Args>
-        int epoll_process(T func,Args&&...args)	 //	epoll all fd and process their request
+        int epoll_process(T func,Args&&...args)	//run a function with args...
 	{
 		return func(args...);
 	}
+	/* example:
+	 *
+	 *	int game(int a,int b)
+	 *	{
+       	 *		for(int j=0;j<a*b;j++)
+         *		{
+         *       		cout<<j<<endl;
+         * 		}
+         *		return 0;
+ 	 *	}
+	 *
+         *	function<int(int,int)> f(game);
+         *	
+	 *	epoll_object.epoll_process<function<int(int,int)>>(f,8,2);  = game(8,2);
+	 *
+	 * */
+
+        int epoll_check_situation()	 //	epoll all fd
+	{
+
+	}
+
     private:
         int epoll_fd;		//	instance of epoll_struct
         int epoll_count;    	//	current event count

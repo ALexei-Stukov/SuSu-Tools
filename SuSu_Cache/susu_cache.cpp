@@ -31,8 +31,8 @@ int susu_cache::remove(string& key)
         else
         {
 		auto it = data_store.find(key);
-		(*it).second->flag = false;
-                delete((*it).second->data);     //free the data
+		//(*it).second->flag = false;
+                //delete((*it).second->data);     //free the data
                 data_store.erase(it);
                 return SUCCESS;
         }
@@ -40,16 +40,15 @@ int susu_cache::remove(string& key)
 
 int susu_cache::remove(string&& key)
 {
-	string temp = std::move(key);
-	if( find_key( temp )==FAIL )       //check if the key is exist
+	if( find_key( key )==FAIL )       //check if the key is exist
         {
 		return KEY_NOT_FOUND;
         }
         else
         {
 		auto it = data_store.find( std::move(key) );
-		(*it).second->flag = false;
-                delete((*it).second->data);     //free the data
+		//(*it).second->flag = false;
+                //delete((*it).second->data);     //free the data
                 data_store.erase(it);
                 return SUCCESS;
         }
@@ -102,7 +101,7 @@ int susu_cache::remove(string&& key)
         }
 
         //remove old data,insert new data
-        int susu_cache::update(string key,void* data)
+        int susu_cache::update(string& key,void* data)
         {
                 if( find_key(key)==FAIL )       //check if the key is exist
                 {
@@ -113,5 +112,18 @@ int susu_cache::remove(string&& key)
                 remove(key);
 
                 return add_kv(key,data);
+        }
+        //remove old data,insert new data
+        int susu_cache::update(string&& key,void* data)
+        {
+                if( find_key(key)==FAIL )       //check if the key is exist
+                {
+                        return KEY_NOT_FOUND;
+                }
+
+                //remove old 
+                remove(key);
+
+                return add_kv(move(key),data);
         }
 }//namespace susu_tools
