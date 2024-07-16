@@ -52,7 +52,7 @@ timer.o:$(susu_timer)susu_timer.cpp
 	$(CC) $(susu_timer)susu_timer.cpp -o $(TEMP)susu_timer.o
 
 epoll.o:$(susu_epoll)susu_epoll.cpp
-	$(CC) $(susu_timer)susu_timer.cpp -o $(TEMP)susu_timer.o
+	$(CC) $(susu_epoll)susu_epoll.cpp -o $(TEMP)susu_epoll.o
 
 
 initparam.o:cache.o $(susu_initparam)susu_initparam.cpp
@@ -73,8 +73,8 @@ test-cache:timer.o cache.o $(TEST)test-cache.cpp
 	$(BUILD) $(TEST)test-cache.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache.bin $(LD)
 	./bin/test-cache.bin
 
-test-epoll:$(TEST)test-epoll.cpp
-	$(BUILD) $(TEST)test-epoll.cpp -o $(BIN)test-epoll.bin $(LD)
+test-epoll:epoll.o $(TEST)test-epoll.cpp
+	$(BUILD) $(TEST)test-epoll.cpp $(TEMP)susu_epoll.o -o $(BIN)test-epoll.bin $(LD)
 	./bin/test-epoll.bin
 
 test-cache-algo:timer.o cache.o $(TEST)test-cache-algo.cpp
