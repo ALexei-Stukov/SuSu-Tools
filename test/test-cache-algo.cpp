@@ -14,8 +14,9 @@ using namespace std;
 
 void print_time(susu_timer timer)
 {
-	timeval ret = timer.get_difference();
-	printf("the time difference is %ld sec %ld ms %ld us\n",ret.tv_sec,ret.tv_usec/1000,ret.tv_usec%1000);
+	//timeval ret = timer.get_difference();
+	//printf("the time difference is %ld sec %ld ms %ld us\n",ret.tv_sec,ret.tv_usec/1000,ret.tv_usec%1000);
+	cout<<"the time differenct is "<<timer.get_difference_ms()<<" ms"<<endl;
 }
 void print_cache_message(susu_cache& Cache)
 {
