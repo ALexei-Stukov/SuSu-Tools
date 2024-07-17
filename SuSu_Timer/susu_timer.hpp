@@ -11,6 +11,7 @@ class susu_timer{
         void begin();    //get the begin time
         void end();  //get the stop time
         timeval get_difference();   //get the time distance  stop - start
+	long long get_difference_ms();	//get the time distance stop - start,return by [ms].
         void delay(long sec,long us);    //delay a period of time
     private:
         timeval start = {0,0};
