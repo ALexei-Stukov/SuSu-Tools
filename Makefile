@@ -2,7 +2,7 @@ CC=g++ -std=c++11 -pipe -O2 -c -Wall $(INCLUDE)
 BUILD=g++ -std=c++11 -pipe -O2 -Wall $(INCLUDE)
 LD = -pthread
 
-INCLUDE= -I$(susu_timer) -I$(susu_cache) -I$(susu_initparam) -I$(susu_epoll)
+INCLUDE= -I$(susu_timer) -I$(susu_cache) -I$(susu_initparam) -I$(susu_epoll) -I$(susu_netprotocol) -I$(susu_fdstream)
 
 TEST=./test/
 BIN=./bin/
@@ -15,14 +15,14 @@ CPP=*.cpp
 susu_timer=./SuSu_Timer/
 susu_initparam=./SuSu_InitParam/
 susu_epoll=./SuSu_Epoll/
+susu_net-protocol=./SuSu_NetProtocol/
+susu_cache=./SuSu_Cache/
+susu_fdstream=./SuSu_FdStream/
+
 
 #---------------------------------------------------
-#	Some test bins about template-tools.
-#	Because of template,these code can't be complie to *.o.
-#	If you wan to use these template-tools,just	[  #include "path_to_the_*.hpp"  ]
-
-susu_cache=./SuSu_Cache/
-
+#	these code can check if the folder exits
+	
 TEMP_FOLDER_NAME=./bin ./temp_file
 
 ifeq ($(wildcard $(TEMP_FOLDER_NAME)),)
@@ -43,23 +43,29 @@ all:folder_check susu-tools test-all
 
 susu-tools:timer.o epoll.o cache.o initparam.o
 
-test-all:folder_check test-cache test-cache-algo test-initparam
+test-all:folder_check test-cache test-cache-algo test-initparam test-epoll
 
 #--------------------------------------------------
 #	all the .o files
 
-timer.o:$(susu_timer)susu_timer.cpp
-	$(CC) $(susu_timer)susu_timer.cpp -o $(TEMP)susu_timer.o
+timer.o:$(susu_timer)$(CPP)
+	$(CC) $(susu_timer)$(CPP) -o $(TEMP)susu_timer.o
 
-epoll.o:$(susu_epoll)susu_epoll.cpp
-	$(CC) $(susu_epoll)susu_epoll.cpp -o $(TEMP)susu_epoll.o
+epoll.o:$(susu_epoll)$(CPP)
+	$(CC) $(susu_epoll)$(CPP) -o $(TEMP)susu_epoll.o
 
 
-initparam.o:cache.o $(susu_initparam)susu_initparam.cpp
-	$(CC) $(susu_initparam)susu_initparam.cpp -o $(TEMP)susu_initparam.o
+initparam.o:cache.o $(susu_initparam)$(CPP)
+	$(CC) $(susu_initparam)$(CPP) -o $(TEMP)susu_initparam.o
 
-cache.o:$(susu_cache)susu_cache.cpp
-	$(CC) $(susu_cache)susu_cache.cpp -o $(TEMP)susu_cache.o
+cache.o:$(susu_cache)$(CPP)
+	$(CC) $(susu_cache)$(CPP) -o $(TEMP)susu_cache.o
+
+http.o:$(susu_net-protocol)susu_http.cpp
+	$(CC) $(susu_net-protocol)susu_http -o $(TEMP)susu_http.o
+
+fdstream.o:$(susu_fdstream)$(CPP)
+	$(CC) $(susu_fdstream)$(CPP) -o $(TEMP)susu_fdstream.o
 
 #---------------------------------------------------
 #	test for some tools.
@@ -80,8 +86,6 @@ test-epoll:epoll.o $(TEST)test-epoll.cpp
 test-cache-algo:timer.o cache.o $(TEST)test-cache-algo.cpp
 	$(BUILD) $(TEST)test-cache-algo.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache-algo.bin $(LD)
 	./bin/test-cache-algo.bin
-
-
 
 .PHONY:clean
 clean:
