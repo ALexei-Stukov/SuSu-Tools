@@ -1,0 +1,100 @@
+#ifndef THREAD_OBJECT
+#define THREAD_OBJECT
+
+#include <vector>
+#include <queue>
+#include <memory>
+#include <thread>
+#include <mutex>
+#include <future>
+#include <functional>
+#include <stdexcept>
+#include <chrono>
+#include <algorithm>
+
+namespace susu_tools{
+class Thread_Object{
+public:
+
+    Thread_Object* return_myself(){return this;};  
+
+    ::std::thread::id get_thread_id();    
+    int get_thread_task_count();   
+    int get_thread_a_result();       
+
+    void thread_sleep(int million); // if use shread_sleep(0), the thread will not sleep 
+    void thread_run();
+    void thread_exit();
+    void thread_pause();
+    
+    ::std::queue< ::std::function<void()>>& get_task_queue(){ return task_queue;} 
+
+    template<class F, class... Args>
+    int add_task(F&& f, Args&&...args);
+
+    template<class F, class... Args>
+    auto enqueue(F&& f, Args&&...args) -> ::std::future< typename ::std::result_of<F(Args...)>::type>;
+
+    void work_loop(); // add this function to  worker
+private:
+
+    bool get_run_flag(){return run;}
+    void set_run_flag(bool flag){ run = flag;}
+
+    bool get_exit_flag(){return exit;}
+    void set_exit_flag(bool flag){ exit = flag;}
+    
+    bool get_sleep_flag(){return sleep;}
+    void set_sleep_flag(bool flag){ sleep = flag;}
+    
+    int get_sleep_time(){return sleep_time;};
+    void set_sleep_time(int million){ sleep_time = million;}  
+
+
+    bool run = true; // run flag
+    bool exit = false; // stop flag
+    bool sleep = false; // sleep flag
+    int sleep_time = 0; // if sleep flag is true, thread will sleep 
+
+    ::std::queue< ::std::function<void()> > task_queue;  //lambda function task
+
+    ::std::queue< ::std::future<int> > task_result_queue; //future  task must be like this: int function(xxx,xxx,xxx......);
+    
+};
+
+
+
+
+//template<class F, class... Args>
+//int Thread_Object::enqueue(F&& f, Args&&... args)
+template<class F, class... Args>
+auto Thread_Object::enqueue(F&& f, Args&&...args) -> ::std::future< typename ::std::result_of<F(Args...)>::type>
+{
+    using return_type = typename ::std::result_of<F(Args...)>::type;
+
+	// bind the function and params ，build a packaged_task. so that (*task)(); = f(args);
+    auto task = ::std::make_shared< ::std::packaged_task<return_type()> >(
+            ::std::bind(::std::forward<F>(f), ::std::forward<Args>(args)...)
+        );
+
+    // get this task's future，  
+    ::std::future<return_type> res = task->get_future();
+  
+    // add thie taskt to task queue
+    task_queue.emplace([task](){ (*task)(); });
+
+    return res;
+};
+
+#include <stdio.h>
+template<class F, class... Args>
+int Thread_Object::add_task(F&& f, Args&&...args)
+{
+    // add this future to result queue
+    //task_result_queue.emplace(enqueue(::std::forward<F>(f), ::std::forward<Args>(args)...));
+    enqueue(::std::forward<F>(f), ::std::forward<Args>(args)...);
+    //printf("emplace a task\n");
+    return 0;
+}     
+}    
+#endif
