@@ -12,41 +12,50 @@
 #include <iostream>
 using std::string;
 
-//#include "../SUSU_LogPrinter/susu_log_printer"
+//#include "susu_cache.hpp"
+//#include "susu_initparam.hpp"
 
-#include "susu_cache.hpp"
-#include "susu_initparam.hpp"
-
-//#define SERVER_STRING "Server: susu_httpd\r\n"
-
-#define line_length_limit 1024
+#define line_length_limit 4096
 
 namespace susu_tools{
 
 class susu_http_object{
 public:
-    void get_request_and_header(int fd);//read the http request head
-					
-    int get_a_line(int sock, char *buf, int size);//get a line from http request,the line must be end with \r\n
+	susu_http_object(int fd);	//we should get the fd at first
+	int get_fd();		//return the fd
+				
+    	int get_a_line();//get a line from http request,the line must be end with \r\n
+			 //if the size is too long (more than [line_length_limit] ),this function will stop reading and make sure buffer is end with \r\n.
+			 //
+			 //for example:
+			 //	data = "1234567890\n"
+			 //	buf[5];
+			 //	use get_a_line(), then  buf = "12\r\n\0", data = "34567890\r\n"()
+	
+    	void get_request_and_header();//read the http request head
+	
     
-    bool check_all_space(char* str); // check if all the char is space in a line
+    	bool check_all_space(char* str); // check if all the char is space in a line
+					 // all space line means the head is end,the next part is body.
      
-    void clear_head_body(); // clean all message.
-			    
+    	void clear_head_message(); // clean all message.
+
+	void write_something(char* buf)
+	{
+		write(fd,buf,sizeof(buf));
+	}
+	
 private:
-    char buffer[line_length_limit];	//the buffer to read request
+    	char buffer[line_length_limit];	//the buffer to read request
+	    
+    	//susu_cache http_request_kv;	//to store all K-V on http head
+
+    	//the first line of http head = method + url + version
+	char method[line_length_limit] = {0};
+    	char url[line_length_limit] = {0};
+    	char version[line_length_limit] = {0};
     
-    string method;	//what method about the request,POST? GET?
-    string url;		
-    string version;	// http version
-    
-    susu_cache http_request_kv;
-    /*
-    	char method[line_limit] = {0};
-    	char url[line_limit] = {0};
-    	char version[line_limit] = {0};
-    */
-    //unordered_map<string,string> http_head_kv;
+	int fd;	// file describe,we should get the fd at first.
 };
 
 }//namespace susu_tools

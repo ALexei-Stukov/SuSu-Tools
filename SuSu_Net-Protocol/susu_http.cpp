@@ -23,9 +23,48 @@ namespace susu_tools{
 * 
 * 该组件默认只支持Lua脚本，但经过简单的修改后就可以支持php脚本
 */
-void susu_http_object::get_request_and_header(int fd)
+
+
+susu_http_object::susu_http_object(int fd)
 {
-	int numchars = get_a_line(fd,buffer, sizeof(buffer)); //get the head of http request in buffer
+	this->fd = fd;
+}
+
+int susu_http_object::get_fd()
+{
+	return fd;
+}
+
+/*//used by other function
+int susu_http_object::fd_write(const char * buffer,size_t n)
+{
+	if(fd>0)
+	{
+		return write(fd,buffer,n);
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+//used by other function
+int susu_http_object::fd_read(char * buffer,size_t n)
+{
+	if(fd>0)
+	{
+
+		return read(fd,buffer,n);
+	}
+	else
+	{
+		return -1;
+	}
+}*/
+
+void susu_http_object::get_request_and_header()
+{
+	int numchars = get_a_line(); //get the head of http request in buffer
     	
 	//check the space count
     	int space_count=0;
@@ -37,7 +76,7 @@ void susu_http_object::get_request_and_header(int fd)
         	}
     	}
 
-	//the first line of normal http request have 2 space.
+	//the first line of normal http request Must have 2 space.
     	if(space_count != 2)
     	{
         	return;
@@ -45,24 +84,30 @@ void susu_http_object::get_request_and_header(int fd)
 
 
     	//get the method,url,version from buffer
-	char[line_length_limit] METHOD;
-	char[line_length_limit] URL;
-	char[line_length_limit] VERSION;
+	//char[line_length_limit] METHOD;
+	//char[line_length_limit] URL;
+	//char[line_length_limit] VERSION;
 
-   	sscanf(buffer,"%[^ ] %[^ ] %[^'\n']",METHOD,URL,VERSION);
-    	method = METHOD;
-    	url = URL;
-    	version = version;
+   	sscanf(buffer,"%[^ ] %[^ ] %[^'\n']",method,url,version);
+    	
+	//method = METHOD;
+    	//url = URL;
+    	//version = version;
+	printf("%s\n %s\n %s\n",method,url,version);
 
-    	while(!check_all_space(buffer))
+    	while( !check_all_space(buffer) )
     	{
-        	numchars = get_a_line(fd, buffer, sizeof(buffer));
+        	numchars = get_a_line();
+
         	string line = buffer;
+
         	size_t pos = line.find(": "); // pos == 7
+					      //
         	if(pos == string::npos)    //忽略不带等号的行
         	{
             		continue;
         	}
+
         	//拆解其中的信息并插入到键值对表中
         	string key,value;
         	key = line.substr(0,pos);
@@ -72,41 +117,62 @@ void susu_http_object::get_request_and_header(int fd)
     	}
 }
 
-int susu_http_object::get_a_line(int sock, char *buf, int size)
+int susu_http_object::get_a_line()
 {
-    int i = 0;
-    char c = '\0';
-    int n;
-    while ((i < size - 1) && (c != '\n'))
+	int length = 0;
+	char ch = '\0';
+	int numchars;
+    while ( length < line_length_limit-2 && ch != '\n'  )
     {
-        n = recv(sock, &c, 1, 0);
-        if (n > 0)
+        numchars = recv(fd, &ch, 1, 0);
+        if (numchars > 0)
         {
-            if (c == '\r')  //遇到'\r'时，尝试构造字符串结尾
+            buffer[length] = ch;
+            length++;
+
+            if (ch == '\r')  //check if the line is end 
             {
-                n = recv(sock, &c, 1, MSG_PEEK);    //使用MSG_PEEK拷贝宏，先从sock中拷贝一下内容，看看是不是'\n'，如果是，则读取。如果不是，则直接忽略并默认在字符串后加上\n。
-                if ((n > 0) && (c == '\n'))
-                recv(sock, &c, 1, 0);
-                else
-                c = '\n';
-            }
-            buf[i] = c;
-            i++;
-        }
-        else
-        {break;}
+                numchars = recv(fd, &ch, 1, MSG_PEEK);    // use MSG_PEEK to check what is the next char in fd, this operation will not affect the data in fd.
+								   // if the next char is '\n',then we read it ,and the line is end.
+								   // if the next char not '\n',do nothing.
+                
+				if ((numchars > 0) && (ch == '\n'))
+				{
+					printf("Now I get this char");
+					recv(fd, &ch, 1, 0);
+            		buffer[length] = ch;
+					length++;
+					break;
+				}
+			}
+    	}
+    	else
+    	{
+			break;
+		}
     }
 
-    buf[i] = '\0';
-    return(i);
+	//make sure the line is end with "\r\n"
+	if(buffer[length-2] != '\r' && buffer[length-1] != '\n')
+	{
+		buffer[length] = '\r';
+		length++;
+		buffer[length] = '\n';
+		length++;
+	}
+
+	buffer[length] = '\0';
+
+	printf("[%s]\n",buffer);
+   	return length;
 }
 
 
-void susu_http_object::clear_head_body()
+void susu_http_object::clear_head_message()
 {
-	method = "";
-	url = "";
-	version = "";
+	method[0] = '\0';
+	url[0] = '\0';
+	version[0] = '\0';
 }
 
 bool susu_http_object::check_all_space(char* str) //check if all the char is space
@@ -131,7 +197,7 @@ bool susu_http_object::str_end_with(char* input,char* end)  //检查某个字符
     {
         return false;
     }
-    for( ;i > 0 && j>0 ; i--,j-- )
+    for( ;i > 0 && j>0 ; i--,j-- )1
     {
         if(input[i] != end[j])
         {
@@ -208,3 +274,4 @@ Via    告知代理客户端响应是通过哪里发送的    Via: 1.0 fred, 1.1
 Warning    警告实体可能存在的问题    Warning: 199 Miscellaneous warning 
 WWW-Authenticate    表明客户端请求实体应该使用的授权方案    WWW-Authenticate: Basic 
 */
+
