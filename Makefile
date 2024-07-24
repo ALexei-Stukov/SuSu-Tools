@@ -2,7 +2,7 @@ CC=g++ -std=c++11 -pipe -c $(INCLUDE) -O2 -Wall
 BUILD=g++ -std=c++11 -pipe $(INCLUDE) -O2 -Wall
 LD = -pthread
 
-INCLUDE=-I $(susu_timer) -I $(susu_cache) -I $(susu_initparam) -I $(susu_epoll) -I $(susu_fdstream)
+INCLUDE=-I $(susu_timer) -I $(susu_cache) -I $(susu_initparam) -I $(susu_epoll) -I $(susu_net-protocol)
 ##-I $(susu_netprotocol)
 
 TEST=./test/
@@ -15,9 +15,8 @@ CPP=*.cpp
 susu_timer=./SuSu_Timer/
 susu_initparam=./SuSu_InitParam/
 susu_epoll=./SuSu_Epoll/
-susu_net-protocol=./SuSu_NetProtocol/
+susu_net-protocol=./SuSu_Net-Protocol/
 susu_cache=./SuSu_Cache/
-susu_fdstream=./SuSu_FdStream/
 
 #---------------------------------------------------
 #	these code can check if the folder exits
@@ -60,11 +59,11 @@ initparam.o:cache.o $(susu_initparam)$(CPP)
 cache.o:$(susu_cache)$(CPP)
 	$(CC) $(susu_cache)$(CPP) -o $(TEMP)susu_cache.o
 
-http.o:fdstream.o $(susu_net-protocol)susu_http.cpp
-	$(CC) $(susu_net-protocol)susu_http -o $(TEMP)susu_http.o
+http.o:$(susu_net-protocol)susu_http.cpp
+	$(CC) $(susu_net-protocol)susu_http.cpp -o $(TEMP)susu_http.o
 
-fdstream.o:$(susu_net-protocol)susu_fdstream.cpp
-	$(CC) $(susu_net-protocol)susu_fdstream.cpp -o $(TEMP)susu_fdstream.o
+socket.o:$(susu_net-protocol)susu_socket.cpp
+	$(CC) $(susu_net-protocol)susu_socket.cpp -o $(TEMP)susu_socket.o
 
 #---------------------------------------------------
 #	test for some tools.
@@ -85,6 +84,24 @@ test-epoll:epoll.o $(TEST)test-epoll.cpp
 test-cache-algo:timer.o cache.o $(TEST)test-cache-algo.cpp
 	$(BUILD) $(TEST)test-cache-algo.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache-algo.bin $(LD)
 	$(BIN)test-cache-algo.bin
+
+test-http:socket.o http.o $(TEST)test-http-server.cpp $(TEST)test-http-client.cpp
+	$(BUILD) $(TEST)test-http-server.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-server.bin $(LD)
+	$(BUILD) $(TEST)test-http-client.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-client.bin $(LD)
+#	nohup $(BIN)test-http.bin > ./bin/test-http.log &
+
+#ifeq ($(curl --version | grep http),"")
+#test-http:
+#	@echo "Need To Install Curl to test susu_http"
+#else
+#test-http:$(TEST)test-http.cpp
+#	$(BUILD) $(TEST)test-http.cpp $(TEMP)susu_http.o -o $(BIN)test-http.bin $(LD)
+#	nohup $(BIN)test-http.bin > ./bin/test-http.log &
+#	
+#
+#	curl --http0.9 "http://127.0.0.1:9527" -X POST -H "Content-Type: application/json" -d "{\"username\":\"admin\",\"password\":\"123456\"}" --output log.txt
+#endif
+
 
 ##test-fdstream:fdstream.o $(TEST)test-fdstream.cpp
 ##	$(BUILD) $(TEST)test-fdstream.cpp $(TEMP)susu_fdstream.o -o $(BIN)test-fdstream.bin $(LD)
