@@ -17,6 +17,7 @@ susu_initparam=./SuSu_InitParam/
 susu_epoll=./SuSu_Epoll/
 susu_net-protocol=./SuSu_Net-Protocol/
 susu_cache=./SuSu_Cache/
+susu_httpd=./SuSu_Httpd/
 
 #---------------------------------------------------
 #	these code can check if the folder exits
@@ -89,6 +90,11 @@ test-http:socket.o http.o $(TEST)test-http-server.cpp $(TEST)test-http-client.cp
 	$(BUILD) $(TEST)test-http-server.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-server.bin $(LD)
 	$(BUILD) $(TEST)test-http-client.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-client.bin $(LD)
 #	nohup $(BIN)test-http.bin > ./bin/test-http.log &
+
+test-httpd:initparam.o $(susu_httpd)susu_httpd.cpp
+	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_initparam.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_epoll.o -o $(BIN)susu_httpd.bin $(LD)	
+	cp $(susu_httpd)/susu_httpd.conf $(BIN)
+	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
 
 #ifeq ($(curl --version | grep http),"")
 #test-http:
