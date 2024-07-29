@@ -2,8 +2,7 @@ CC=g++ -std=c++11 -pipe -c $(INCLUDE) -O2 -Wall
 BUILD=g++ -std=c++11 -pipe $(INCLUDE) -O2 -Wall
 LD = -pthread
 
-INCLUDE=-I $(susu_timer) -I $(susu_cache) -I $(susu_initparam) -I $(susu_epoll) -I $(susu_net-protocol)
-##-I $(susu_netprotocol)
+INCLUDE=-I $(susu_timer) -I $(susu_cache) -I $(susu_initparam) -I $(susu_epoll) -I $(susu_net-protocol) -I $(susu_threadpool) -I $(susu_taskqueue)
 
 TEST=./test/
 BIN=./bin/
@@ -18,6 +17,8 @@ susu_epoll=./SuSu_Epoll/
 susu_net-protocol=./SuSu_Net-Protocol/
 susu_cache=./SuSu_Cache/
 susu_httpd=./SuSu_Httpd/
+susu_threadpool=./SuSu_ThreadPool/
+susu_taskqueue=./SuSu_Task-queue/
 
 #---------------------------------------------------
 #	these code can check if the folder exits
@@ -44,6 +45,7 @@ susu-tools:timer.o epoll.o cache.o initparam.o
 
 test-all:folder_check test-cache test-cache-algo test-initparam test-epoll
 
+
 #--------------------------------------------------
 #	all the .o files
 
@@ -66,6 +68,12 @@ http.o:$(susu_net-protocol)susu_http.cpp
 socket.o:$(susu_net-protocol)susu_socket.cpp
 	$(CC) $(susu_net-protocol)susu_socket.cpp -o $(TEMP)susu_socket.o
 
+thread.o:timer.o $(susu_threadpool)susu_thread.cpp
+	$(CC) $(susu_threadpool)susu_thread.cpp $(TEMP)susu_timer.o -o $(TEMP)susu_thread.o
+
+threadpool.o:$(susu_threadpool)susu_thread_pool.cpp
+	$(CC) $(susu_threadpool)susu_threadpool.cpp susu_thread_object-o $(TEMP)susu_socket.o
+
 #---------------------------------------------------
 #	test for some tools.
 
@@ -86,15 +94,23 @@ test-cache-algo:timer.o cache.o $(TEST)test-cache-algo.cpp
 	$(BUILD) $(TEST)test-cache-algo.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache-algo.bin $(LD)
 	$(BIN)test-cache-algo.bin
 
-test-http:socket.o http.o $(TEST)test-http-server.cpp $(TEST)test-http-client.cpp
-	$(BUILD) $(TEST)test-http-server.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-server.bin $(LD)
-	$(BUILD) $(TEST)test-http-client.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-client.bin $(LD)
+#test-http:socket.o http.o $(TEST)test-http-server.cpp $(TEST)test-http-client.cpp
+#	$(BUILD) $(TEST)test-http-server.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-server.bin $(LD)
+#	$(BUILD) $(TEST)test-http-client.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-client.bin $(LD)
 #	nohup $(BIN)test-http.bin > ./bin/test-http.log &
 
 test-httpd:initparam.o $(susu_httpd)susu_httpd.cpp
 	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_initparam.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_epoll.o -o $(BIN)susu_httpd.bin $(LD)	
 	cp $(susu_httpd)/susu_httpd.conf $(BIN)
 	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
+
+test-thread:thread.o $(TEST)test-thread.cpp
+	$(BUILD) $(TEST)test-thread.cpp $(TEMP)susu_thread.o -o $(BIN)test-thread.bin $(LD)
+	$(BIN)test-thread.bin
+
+test-task-queue:$(TEST)test-task-queue.cpp
+	$(BUILD) $(TEST)test-task-queue.cpp -o $(BIN)test-task-queue.bin $(LD)
+	$(BIN)test-task-queue.bin
 
 #ifeq ($(curl --version | grep http),"")
 #test-http:
