@@ -2,7 +2,7 @@ CC=g++ -std=c++11 -pipe -c $(INCLUDE) -O2 -Wall
 BUILD=g++ -std=c++11 -pipe $(INCLUDE) -O2 -Wall
 LD = -pthread
 
-INCLUDE=-I $(susu_timer) -I $(susu_cache) -I $(susu_initparam) -I $(susu_epoll) -I $(susu_net-protocol) -I $(susu_threadpool) -I $(susu_taskqueue)
+INCLUDE=-I $(susu_timer) -I $(susu_cache) -I $(susu_init-param) -I $(susu_epoll) -I $(susu_net-protocol) -I $(susu_thread-pool) -I $(susu_task-queue)
 
 TEST=./test/
 BIN=./bin/
@@ -12,13 +12,13 @@ CPP=*.cpp
 #---------------------------------------------------
 
 susu_timer=./SuSu_Timer/
-susu_initparam=./SuSu_InitParam/
+susu_init-param=./SuSu_Init-Param/
 susu_epoll=./SuSu_Epoll/
 susu_net-protocol=./SuSu_Net-Protocol/
 susu_cache=./SuSu_Cache/
 susu_httpd=./SuSu_Httpd/
-susu_threadpool=./SuSu_ThreadPool/
-susu_taskqueue=./SuSu_Task-queue/
+susu_thread-pool=./SuSu_Thread-Pool/
+susu_task-queue=./SuSu_Task-Queue/
 
 #---------------------------------------------------
 #	these code can check if the folder exits
@@ -34,7 +34,6 @@ folder_check:
 	@echo "$(TEMP_FOLDER_NAME) folder already exists"
 	#do nothing
 endif
-
 
 
 
@@ -56,8 +55,8 @@ epoll.o:$(susu_epoll)$(CPP)
 	$(CC) $(susu_epoll)$(CPP) -o $(TEMP)susu_epoll.o
 
 
-initparam.o:cache.o $(susu_initparam)$(CPP)
-	$(CC) $(susu_initparam)$(CPP) -o $(TEMP)susu_initparam.o
+init-param.o:cache.o $(susu_init-param)$(CPP)
+	$(CC) $(susu_init-param)$(CPP) -o $(TEMP)susu_init_param.o
 
 cache.o:$(susu_cache)$(CPP)
 	$(CC) $(susu_cache)$(CPP) -o $(TEMP)susu_cache.o
@@ -68,19 +67,19 @@ http.o:$(susu_net-protocol)susu_http.cpp
 socket.o:$(susu_net-protocol)susu_socket.cpp
 	$(CC) $(susu_net-protocol)susu_socket.cpp -o $(TEMP)susu_socket.o
 
-thread.o:timer.o $(susu_threadpool)susu_thread.cpp
-	$(CC) $(susu_threadpool)susu_thread.cpp $(TEMP)susu_timer.o -o $(TEMP)susu_thread.o
+thread-worker.o:timer.o $(susu_thread-pool)susu_thread_worker.cpp
+	$(CC) $(susu_thread-pool)susu_thread_worker.cpp $(TEMP)susu_timer.o -o $(TEMP)susu_thread_worker.o
 
-threadpool.o:$(susu_threadpool)susu_thread_pool.cpp
-	$(CC) $(susu_threadpool)susu_threadpool.cpp susu_thread_object-o $(TEMP)susu_socket.o
+thread-pool.o:thread-worker.o $(susu_thread-pool)susu_thread_pool.cpp
+	$(CC) $(susu_thread-pool)susu_thread_pool.cpp $(TEMP)susu_thread_worker.o -o $(TEMP)susu_thread_pool.o
 
 #---------------------------------------------------
 #	test for some tools.
 
-test-initparam:initparam.o $(TEST)test-initparam.cpp
-	$(BUILD) $(TEST)test-initparam.cpp $(TEMP)susu_initparam.o $(TEMP)susu_cache.o -o $(BIN)test-initparam.bin $(LD)	
-	cp SuSu_InitParam/example.conf $(BIN)
-	$(BIN)test-initparam.bin .$(BIN)example.conf
+test-init-param:init-param.o $(TEST)test-init-param.cpp
+	$(BUILD) $(TEST)test-init-param.cpp $(TEMP)susu_init_param.o $(TEMP)susu_cache.o -o $(BIN)test-init-param.bin $(LD)	
+	cp SuSu_Init-Param/example.conf $(BIN)
+	$(BIN)test-init-param.bin $(BIN)example.conf
 
 test-cache:timer.o cache.o $(TEST)test-cache.cpp
 	$(BUILD) $(TEST)test-cache.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache.bin $(LD)
@@ -99,13 +98,9 @@ test-cache-algo:timer.o cache.o $(TEST)test-cache-algo.cpp
 #	$(BUILD) $(TEST)test-http-client.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-client.bin $(LD)
 #	nohup $(BIN)test-http.bin > ./bin/test-http.log &
 
-test-httpd:initparam.o $(susu_httpd)susu_httpd.cpp
-	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_initparam.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_epoll.o -o $(BIN)susu_httpd.bin $(LD)	
-	cp $(susu_httpd)/susu_httpd.conf $(BIN)
-	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
 
-test-thread:thread.o $(TEST)test-thread.cpp
-	$(BUILD) $(TEST)test-thread.cpp $(TEMP)susu_thread.o -o $(BIN)test-thread.bin $(LD)
+test-thread-pool:thread-pool.o $(TEST)test-thread-pool.cpp
+	$(BUILD) $(TEST)test-thread-pool.cpp $(TEMP)susu_thread_pool.o $(TEMP)susu_thread_worker.o $(TEMP)susu_timer.o -o $(BIN)test-thread.bin $(LD)
 	$(BIN)test-thread.bin
 
 test-task-queue:$(TEST)test-task-queue.cpp
@@ -125,9 +120,13 @@ test-task-queue:$(TEST)test-task-queue.cpp
 #endif
 
 
-##test-fdstream:fdstream.o $(TEST)test-fdstream.cpp
-##	$(BUILD) $(TEST)test-fdstream.cpp $(TEMP)susu_fdstream.o -o $(BIN)test-fdstream.bin $(LD)
-##	cd $(BIN) && ./test-fdstream.bin
+#---------------------------------------------------
+#	some useful application.
+#
+test-httpd:init-param.o $(susu_httpd)susu_httpd.cpp
+	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init_param.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_epoll.o -o $(BIN)susu_httpd.bin $(LD)	
+	cp $(susu_httpd)/susu_httpd.conf $(BIN)
+	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
 
 .PHONY:clean
 clean:
