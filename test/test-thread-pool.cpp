@@ -21,7 +21,12 @@ int funny(int input)
 
 int main()
 {
+	susu_thread_pool::set_init_count(2);
 	susu_thread_pool* tp = susu_thread_pool::get_susu_thread_pool();
+	for(int i=0;i<10000;i++)
+	{
+		tp->add_task(funny,i);
+	}
 
 	getchar();
 	getchar();

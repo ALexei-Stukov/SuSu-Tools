@@ -73,7 +73,7 @@ susu_thread_pool::susu_thread_pool()
     
 
     //Dynamic_Expansion
-    //Dynamic_Expansion = ::std::thread([this](){this->dynamic_expansion_reduction();});
+    Dynamic_Expansion = ::std::thread([this](){this->dynamic_expansion_reduction();});
 }
 
 //compare function
