@@ -96,9 +96,9 @@ int susu_initparam::load_init_param(const char* str)  //加载参数
 string susu_initparam::get_value(string key)
 {
 	if(init_param.find_key(key) != FAIL)
-        {
+    {
 		return *(init_param.get<string>(key));
-        }
+    }
 	else
 	{
 		return "ERROR";

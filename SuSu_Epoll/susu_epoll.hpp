@@ -46,21 +46,21 @@ namespace susu_tools{
 
 class susu_epoll{
 public:
-        susu_epoll(int limit = MAX_EVENTS);	//limit is a useless param.
+    susu_epoll(int limit = MAX_EVENTS);	//limit is a useless param.
 	~susu_epoll();
 
-        int get_current_event_count();	//get the current fd counts.
+    int get_current_event_count();	//get the current fd counts.
 	int get_event_limit();	//  The MAX fd count can be listened by a SuSu_Epoll object.(event is created by fd).
 
 	int check_epoll_fd();	//check the epoll_fd is useful or not
 
-        int add_a_event(int fd);  //add a fd to epoll struct.
+    int add_a_event(int fd);  //add a fd to epoll struct.
 				  //in most of times,this function will be call by other codes.
 
 	int get_epoll_result(int ms_count);	//get some event from fd,and store the event in array EVENTS;
 						//if ms_count = -1, keep waiting
 	template<class T,class...Args>
-        int epoll_process(function<T(Args...)> func,Args&&... args)	//run a function with args,and get the return
+    int epoll_process(function<T(Args...)> func,Args&&... args)	//run a function with args,and get the return
 	{	
 		return func(args...);
 	}

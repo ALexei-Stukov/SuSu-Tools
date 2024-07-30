@@ -14,16 +14,16 @@ using namespace std;
 
 int main(int argc,char** argv)
 {
-        if(argc <= 1 )
-        {
-                printf("too less param\n");
-                return 0;
-        }
-        auto ins = susu_initparam::get_Init_Param_instance();
+    if(argc <= 1 )
+    {
+            printf("too less param\n");
+            return 0;
+    }
+    auto ins = susu_initparam::get_Init_Param_instance();
 
-        cout<<"load param file:"<<argv[1]<<endl;
-        ins->load_init_param(argv[1]);
-        cout<<endl;
+    cout<<"load param file:"<<argv[1]<<endl;
+    ins->load_init_param(argv[1]);
+    cout<<endl;
 
 
 	int server_socket = -1;// fd;
@@ -41,16 +41,14 @@ int main(int argc,char** argv)
 	
 
 	struct sockaddr_in client_addr;
-    	socklen_t client_addr_size = sizeof(client_addr);
+    socklen_t client_addr_size = sizeof(client_addr);
 	int client_socket = -1;
 	while(true)
 	{
-    		client_socket = accept(server_socket,
-            			(struct sockaddr *)&client_addr,
-            			&client_addr_size);
+    	client_socket = accept(server_socket,(struct sockaddr *)&client_addr,&client_addr_size);
 
-    		if (client_socket != -1)
-    		{
+    	if (client_socket != -1)
+    	{
 			epoll_object.add_a_event(client_socket);
 			//add new connect to the epoll control object
 			
@@ -62,9 +60,9 @@ int main(int argc,char** argv)
 			//	epoll对象筛选出待通讯fd
 			//	for循环依次处理所有fd。
 			//	处理fd时一般是调用脚本读取html并返回。
-    		}
+    	}
 	}
 	
 	close(server_socket);
-        return 0;
+    return 0;
 }

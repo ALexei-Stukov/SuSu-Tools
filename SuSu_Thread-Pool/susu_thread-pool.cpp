@@ -43,18 +43,18 @@ void susu_thread_pool::add_a_thread()
 int susu_thread_pool::init_count;
 void susu_thread_pool::set_init_count(int n)
 {
-        int temp = n;
-        if(temp > max_count)
-        {
+    int temp = n;
+    if(temp > max_count)
+    {
 		temp = max_count;
 	}
 
-        if(temp < min_count)
-        {
+    if(temp < min_count)
+    {
 		temp = min_count;
 	}
 
-        init_count = temp;
+    init_count = temp;
 }
 
 susu_thread_pool::susu_thread_pool()
@@ -172,41 +172,41 @@ bool susu_thread_pool::expansion_check()
 {
        	//thread poll will init a new thread if this function return true
 	if(dynamic_param == 0)
-        {
+    {
 		return false;
 	}
 
-        int sum_thread_task_count = 0;
-        int sum_thread_count = 0;
-        for(auto it = workers.begin();it != workers.end();it++)
-        {
+    int sum_thread_task_count = 0;
+    int sum_thread_count = 0;
+    for(auto it = workers.begin();it != workers.end();it++)
+    {
 		sum_thread_task_count += (*it)->get_thread_task_count();
 		sum_thread_count++;
-        }
+    }
 
         //if sqrt(sum_thread_task_count)/dynamic_param > sum_thread_count, init a new thread
 
-        int temp = (sum_thread_task_count >> 1)/dynamic_param - sum_thread_count;
-        if(temp > 0)
-        {
+    int temp = (sum_thread_task_count >> 1)/dynamic_param - sum_thread_count;
+    if(temp > 0)
+    {
 		return true;
 	}
-        else
-        {
+    else
+    {
 		return false;
 	}
 }
 
 void susu_thread_pool::set_dynamic_param(int n)
 {
-        int temp = n;
-        if(temp > max_count)
-        {
+    int temp = n;
+    if(temp > max_count)
+    {
 		temp = max_count;
 	}
 
-        if(temp < min_count)
-        {
+    if(temp < min_count)
+    {
 		temp = min_count;
 	}
 
@@ -220,14 +220,14 @@ int susu_thread_pool::get_dynamic_param()
 
 void susu_thread_pool::set_thread_low_limit(int n)
 {
-        int temp = n;
-        if(temp > max_count)
-        {
+    int temp = n;
+    if(temp > max_count)
+    {
 		temp = max_count;
 	}
 
-        if(temp < min_count)
-        {
+    if(temp < min_count)
+    {
 		temp = min_count;
 	}
 
@@ -241,14 +241,14 @@ int susu_thread_pool::get_thread_low_limit()
 
 void susu_thread_pool::set_thread_up_limit(int n)
 {
-        int temp = n;
-        if(temp > max_count)
-        {
+    int temp = n;
+    if(temp > max_count)
+    {
 		temp = max_count;
 	}
 
-        if(temp < min_count)
-        {
+    if(temp < min_count)
+    {
 		temp = min_count;
 	}
 

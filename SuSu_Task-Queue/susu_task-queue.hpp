@@ -84,14 +84,14 @@ public:
 		}
 		else
 		{
-    			enqueue( forward<F>(func), forward<Args>(args)...);
-    			return task_queue.size();	//return the current task count;
+    		enqueue( forward<F>(func), forward<Args>(args)...);
+    		return task_queue.size();	//return the current task count;
 		}
 	}
 
     	
 	void execute_a_task()
-    	{
+    {
 		if(get_task_queue_size() > 0 )
 		{
 			function<void()> task;
@@ -100,7 +100,7 @@ public:
 			task_queue.pop();
 			task();
 		}
-        }
+    }
 
 	// ms_count < 0 : wait for the result in block
 	//
@@ -154,9 +154,9 @@ public:
 					FUTURE_RET ret = {0,SUSU_FUTURE_NOT_READY};
 					return ret;
 				}
-        		}
+        	}
 		}
-    	}
+    }
 
 	int get_task_queue_size()
 	{
