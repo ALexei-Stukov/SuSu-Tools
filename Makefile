@@ -1,95 +1,76 @@
-CC=g++ -std=c++11 -pipe -c $(INCLUDE) -O2 -Wall
-BUILD=g++ -std=c++11 -pipe $(INCLUDE) -O2 -Wall
-LD = -pthread
-
-INCLUDE=-I $(susu_timer) -I $(susu_cache) -I $(susu_init-param) -I $(susu_epoll) -I $(susu_net-protocol) -I $(susu_thread-pool) -I $(susu_task-queue)
-
-TEST=./test/
-BIN=./bin/
-TEMP=./temp_file/
-CPP=*.cpp
+include config.mk
 
 #---------------------------------------------------
+#	these code can check if the TEMP_FOLDER exits
 
-susu_timer=./SuSu_Timer/
-susu_init-param=./SuSu_Init-Param/
-susu_epoll=./SuSu_Epoll/
-susu_net-protocol=./SuSu_Net-Protocol/
-susu_cache=./SuSu_Cache/
-susu_httpd=./SuSu_Httpd/
-susu_thread-pool=./SuSu_Thread-Pool/
-susu_task-queue=./SuSu_Task-Queue/
-
-#---------------------------------------------------
-#	these code can check if the folder exits
-	
-TEMP_FOLDER_NAME=./bin ./temp_file
-
-ifeq ($(wildcard $(TEMP_FOLDER_NAME)),)
+ifeq ($(wildcard $(TEMP_FOLDER)),)
 folder_check:
-	@echo "Creating $(TEMP_FOLDER_NAME) folder"
-	@mkdir -p $(TEMP_FOLDER_NAME)
+	@echo "Creating $(TEMP_FOLDER) folder"
+	@mkdir -p $(TEMP_FOLDER)
 else
 folder_check:
-	@echo "$(TEMP_FOLDER_NAME) folder already exists"
-	#do nothing
+	@echo "$(TEMP_FOLDER) folder already exists"
 endif
 
+#---------------------------------------------------
+#	call other makefile
 
+all:folder_check SUSU_TOOLS TEST_ALL
 
+SUSU_TOOLS:TIMER CACHE INIT-PARAM HTTP SOCKET THREAD-WORKER THREAD-POOL EPOLL
+#---------------------------------------------------
+#	SUSU_TOOLS
+TIMER:
+	cd $(susu_timer) && $(MAKE) all ROOT=$(ROOT);
+	cd ../
 
-all:folder_check susu-tools test-all
+CACHE:
+	cd $(susu_cache) && $(MAKE) all ROOT=$(ROOT);
+	cd ../
 
-susu-tools:timer.o epoll.o cache.o initparam.o
+EPOLL:
+	cd $(susu_epoll) && $(MAKE) all ROOT=$(ROOT);
+	cd ../
 
-test-all:folder_check test-cache test-cache-algo test-initparam test-epoll
+INIT-PARAM:CACHE
+	cd $(susu_init-param) && $(MAKE) all ROOT=$(ROOT);
+	cd ../
 
+HTTP:
+	cd $(susu_net-protocol) && $(MAKE) susu_http.o ROOT=$(ROOT);
+	cd ../
 
-#--------------------------------------------------
-#	all the .o files
+SOCKET:
+	cd $(susu_net-protocol) && $(MAKE) susu_socket.o ROOT=$(ROOT);
+	cd ../
 
-timer.o:$(susu_timer)$(CPP)
-	$(CC) $(susu_timer)$(CPP) -o $(TEMP)susu_timer.o
+THREAD-WORKER:TIMER
+	cd $(susu_thread-pool) && $(MAKE) susu_thread-worker.o ROOT=$(ROOT);
+	cd ../
+THREAD-POOL:TIMER
+	cd $(susu_thread-pool) && $(MAKE) susu_thread-pool.o ROOT=$(ROOT);
+	cd ../	
 
-epoll.o:$(susu_epoll)$(CPP)
-	$(CC) $(susu_epoll)$(CPP) -o $(TEMP)susu_epoll.o
-
-
-init-param.o:cache.o $(susu_init-param)$(CPP)
-	$(CC) $(susu_init-param)$(CPP) -o $(TEMP)susu_init_param.o
-
-cache.o:$(susu_cache)$(CPP)
-	$(CC) $(susu_cache)$(CPP) -o $(TEMP)susu_cache.o
-
-http.o:$(susu_net-protocol)susu_http.cpp
-	$(CC) $(susu_net-protocol)susu_http.cpp -o $(TEMP)susu_http.o
-
-socket.o:$(susu_net-protocol)susu_socket.cpp
-	$(CC) $(susu_net-protocol)susu_socket.cpp -o $(TEMP)susu_socket.o
-
-thread-worker.o:timer.o $(susu_thread-pool)susu_thread_worker.cpp
-	$(CC) $(susu_thread-pool)susu_thread_worker.cpp $(TEMP)susu_timer.o -o $(TEMP)susu_thread_worker.o
-
-thread-pool.o:thread-worker.o $(susu_thread-pool)susu_thread_pool.cpp
-	$(CC) $(susu_thread-pool)susu_thread_pool.cpp $(TEMP)susu_thread_worker.o -o $(TEMP)susu_thread_pool.o
-
+#---------------------------------------------------
+#	TEST_ALL
+TEST_ALL:folder_check test-cache test-cache-algo test-init-param test-epoll
 #---------------------------------------------------
 #	test for some tools.
 
-test-init-param:init-param.o $(TEST)test-init-param.cpp
-	$(BUILD) $(TEST)test-init-param.cpp $(TEMP)susu_init_param.o $(TEMP)susu_cache.o -o $(BIN)test-init-param.bin $(LD)	
+test-init-param:INIT-PARAM $(TEST)test-init-param.cpp
+	$(BUILD) $(TEST)test-init-param.cpp $(TEMP)susu_init-param.o $(TEMP)susu_cache.o -o $(BIN)test-init-param.bin $(LD)	
 	cp SuSu_Init-Param/example.conf $(BIN)
 	$(BIN)test-init-param.bin $(BIN)example.conf
 
-test-cache:timer.o cache.o $(TEST)test-cache.cpp
+test-cache:TIMER CACHE $(TEST)test-cache.cpp
 	$(BUILD) $(TEST)test-cache.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache.bin $(LD)
 	$(BIN)test-cache.bin
 
-test-epoll:epoll.o $(TEST)test-epoll.cpp
+test-epoll:EPOLL $(TEST)test-epoll.cpp
 	$(BUILD) $(TEST)test-epoll.cpp $(TEMP)susu_epoll.o -o $(BIN)test-epoll.bin $(LD)
 	$(BIN)test-epoll.bin
 
-test-cache-algo:timer.o cache.o $(TEST)test-cache-algo.cpp
+test-cache-algo:TIMER CACHE $(TEST)test-cache-algo.cpp
 	$(BUILD) $(TEST)test-cache-algo.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache-algo.bin $(LD)
 	$(BIN)test-cache-algo.bin
 
@@ -99,8 +80,8 @@ test-cache-algo:timer.o cache.o $(TEST)test-cache-algo.cpp
 #	nohup $(BIN)test-http.bin > ./bin/test-http.log &
 
 
-test-thread-pool:thread-pool.o $(TEST)test-thread-pool.cpp
-	$(BUILD) $(TEST)test-thread-pool.cpp $(TEMP)susu_thread_pool.o $(TEMP)susu_thread_worker.o $(TEMP)susu_timer.o -o $(BIN)test-thread.bin $(LD)
+test-thread-pool:THREAD-POLL $(TEST)test-thread-pool.cpp
+	$(BUILD) $(TEST)test-thread-pool.cpp $(TEMP)susu_thread-pool.o $(TEMP)susu_thread-worker.o $(TEMP)susu_TIMER -o $(BIN)test-thread.bin $(LD)
 	$(BIN)test-thread.bin
 
 test-task-queue:$(TEST)test-task-queue.cpp
@@ -124,7 +105,7 @@ test-task-queue:$(TEST)test-task-queue.cpp
 #	some useful application.
 #
 test-httpd:init-param.o $(susu_httpd)susu_httpd.cpp
-	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init_param.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_epoll.o -o $(BIN)susu_httpd.bin $(LD)	
+	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init_param.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_EPOLL -o $(BIN)susu_httpd.bin $(LD)	
 	cp $(susu_httpd)/susu_httpd.conf $(BIN)
 	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
 
@@ -132,3 +113,32 @@ test-httpd:init-param.o $(susu_httpd)susu_httpd.cpp
 clean:
 	rm ./temp_file/*
 	rm ./bin/*
+
+
+#some useless example code
+
+#all:
+#names = a b c d
+#files := $(foreach n,$(names),$(n).o)
+#demo:
+# cd subdir && \
+# for x in $(files); do\
+# echo $$a;\
+# done
+
+#susu-tools:
+#	for x in $(ALL_SOURCE_FOLDER) ; do \
+#		cd $$x && $(MAKE) all ROOT=$(ROOT);	\
+#		cd ../ ;	\
+#    done
+#I think I must describe about $$x
+#	in makefile:
+#	x = char x
+#	$(x) = the value of variable x
+#	$($(x)): t = $(x), $($(x)) = $(t)
+#	$$x  $x  :makefile have no such code,
+
+#	BUT in shell (bash) :
+#	x = char x
+#	$x = string "$x"
+#	$$x	= the value of variable x
