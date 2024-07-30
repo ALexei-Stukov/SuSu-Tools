@@ -69,7 +69,7 @@ int main()
 	//listen a fd
 	epoll_object.add_a_event(0);	//linsten the std input
 	
-        cout<<"try to input someting please-------------------"<<endl;
+    cout<<"try to input a string please-------------------"<<endl;
 	for(int loop = 0;loop < 1;loop++)
 	{
 		if( 0 != epoll_object.get_epoll_result(-1) )

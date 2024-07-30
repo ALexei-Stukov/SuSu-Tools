@@ -1,7 +1,7 @@
 #ifndef SUSU_THREAD_CONTROLER
 #define SUSU_THREAD_CONTROLER
 
-#include "susu_thread_worker.hpp"
+#include "susu_thread-worker.hpp"
 
 #ifndef SUSU_THREAD_POOL_INIT_COUNT
     #define max_count 256

@@ -1,4 +1,4 @@
-#include "susu_initparam.hpp"
+#include "susu_init-param.hpp"
 
 using namespace susu_tools;
 using namespace std;
