@@ -22,11 +22,11 @@ Building a **high-performance http service**. (Maybe also include **https** serv
 
 The project includes the following tools:
 
-[Timer](./SuSu_Timer/README.md):A useful timer.
+[Timer](./SuSu_Timer/README.md): A useful timer.
 
-[Epoll](./SuSu_Epoll/README.md):A tool to listening fd.
+[Epoll](./SuSu_Epoll/README.md): A tool to listening file describer.
 
-[Init-Param](./SuSu_InitParam/README.md):A easy way to manager the Init params.
+[Init-Param](./SuSu_InitParam/README.md): A easy way to manager the Init params.
 
 [Thread-Pool](./SuSu_ThreadPool/README.md)
 

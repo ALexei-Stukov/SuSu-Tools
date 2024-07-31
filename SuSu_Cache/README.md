@@ -58,7 +58,7 @@ In my views,you can follow these tips to check what function you need to use:
 
 **add_swap:**replace "add" when you want to avoid copy constructor.
 
-##How to complie
+##How to compile
 I provide a test example,You can refer it.
 ```
 make test
