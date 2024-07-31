@@ -70,7 +70,7 @@ int main()
     //some codes
 }
 ```
-The test is good example for beginners,it will tell you how to use SuSu_Tools.
+The tests in ./test/ is good example for beginners,it will tell you how to use SuSu_Tools.
 
 ## Httpd
 ```
