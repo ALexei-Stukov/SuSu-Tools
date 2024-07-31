@@ -22,19 +22,32 @@ Building a **high-performance http service**. (Maybe also include **https** serv
 
 The project includes the following tools:
 
-[Timer](./SuSu_Timer/README.md)
+[Timer](./SuSu_Timer/README.md)A useful timer.
 
 [Epoll](./SuSu_Epoll/README.md)
 
-[InitParam](./SuSu_InitParam/README.md)
+[Init-Param](./SuSu_InitParam/README.md)A easy way to manager the Init params.
 
-[ThreadPool](./SuSu_ThreadPool/README.md)
+[Thread-Pool](./SuSu_ThreadPool/README.md)
 
-[NetProtocol](./SuSu_NetProtocol/README.md)
+[Net-Protocol](./SuSu_NetProtocol/README.md)
 
 These tools make up the following program:
 
 [Httpd](./SuSu_Httpd/README.md)
+## How to compile all the tools?
+
+you can use these code:
+```
+    make SUSU_TOOLS
+```
+## How to test all the tools?
+
+you can use these code:
+```
+    make TEST_ALL
+```
+Some tests are interactive,the tasts will block if no inputs.Some tests cost lot's of times.So maybe use **make TEST_ALL** is not a good idea.
 
 # How to use this project
 ## Httpd
