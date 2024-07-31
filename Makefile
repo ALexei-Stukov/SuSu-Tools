@@ -109,6 +109,11 @@ test-httpd:init-param.o $(susu_httpd)susu_httpd.cpp
 	cp $(susu_httpd)/susu_httpd.conf $(BIN)
 	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
 
+HTTPD:
+
+RUN-HTTPD:
+
+
 .PHONY:clean
 clean:
 	rm ./temp_file/*

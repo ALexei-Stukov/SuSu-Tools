@@ -31,7 +31,9 @@ The project includes the following tools:
 
 [Net-Protocol](./SuSu_Net-Protocol/README.md): Some tools in net.
 
-[cache](./SuSu_Cache/README.md): a cache tool made by template.
+[Cache](./SuSu_Cache/README.md): a cache tool made by template.
+
+[Task-Queue](./SuSu_Task-Queue/README.md): a task queue made by template.
 
 These tools make up the following program:
 
@@ -70,13 +72,13 @@ int main()
     //some codes
 }
 ```
-The tests in ./test/ is good example for beginners,it will tell you how to use SuSu_Tools.
+The tests in **./test/** is good example for beginners,it will tell you how to use SuSu_Tools.
 
 ## Httpd
 ```
-sudo apt install lua5.3     # Lua is the default script,But you can change it to other script.
-make httpd          # the http service
-make run            # run the http service
+sudo apt install lua5.3     # Lua is the default script in susu_httpd,But you can change it to other script.
+make HTTPD          # the http service
+make RUN-HTTPD            # run the http service
 ```
 Then open **127.0.0.1:9512** in browser to view the default web page.
 

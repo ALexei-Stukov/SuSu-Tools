@@ -32,3 +32,5 @@ int main()
 ```
 this timer can only accurate to ms.
 in most of Linux system,the delta is 20-500 us.
+
+you can find more function in .hpp file
