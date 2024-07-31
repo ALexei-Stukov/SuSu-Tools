@@ -4,7 +4,7 @@ SuSu-Timeris a tiny and useful timer.It is a **common component** in SuSu-Tools
 
 you can use it just like this:
 
-```cplusplus
+```cpp
 #include "susu_timer.hpp"
 #include <cstdio>
 
