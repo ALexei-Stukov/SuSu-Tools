@@ -27,18 +27,11 @@ The project includes the following tools:
 
 [Init-Param](./SuSu_Init-Param/README.md): A easy way to manager the Init params.
 
-[Thread-Pool](./SuSu_Thread-Pool/README.md): A thread pool supports asynchronous(future).
+[Thread-Pool](./SuSu_Thread-Pool/README.md): A thread pool supports asynchronous( #include <future> ).
 
 [Net-Protocol](./SuSu_Net-Protocol/README.md): Some tools in net.
 
 [cache](./SuSu_Cache/README.md): a cache tool made by template.
-
-[SOCKET](./SuSu_Net-Protocol/README.md): a cache tool made by template.
-
-[cache](./SuSu_Cache/README.md): a cache tool made by template.
-
-[cache](./SuSu_Cache/README.md): a cache tool made by template.
-
 
 These tools make up the following program:
 

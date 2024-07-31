@@ -1,5 +1,7 @@
 ## Short describe about this k-v storeage
 
+[Introduction of SuSu-Tools](../README.md)
+
 SuSu_Cache is a **K-V storeage unit**.
 
 The value is **implemented by template**,so you also can consider it as **Object storage unit**.
