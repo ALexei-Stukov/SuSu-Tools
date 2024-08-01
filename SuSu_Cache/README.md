@@ -8,6 +8,15 @@ The value is **implemented by template**,so you also can consider it as **Object
 
 If you want to use a **tiny or temporary cache**,you can try to use this tool.
 
+## Key points 
+**Performance is not very high.**
+
+**Useful in lite load scenarios.**
+
+**Make by template.**
+
+**Not thread-safe.**
+
 ## Why did I design this tools?
 
 As we know,If we wan to use cache,the best choice is **redis** or **sqlite**.
@@ -20,70 +29,81 @@ So I design this tools for myself.
 
 ## How to use this tool?
 
-### 1.singal thread - normal situation
+just like this:
 
-in most situation,you just need to use these codes:
-```cplusplus
-#include "susu_cache.h"              //head file
+```cpp
+#include "susu_cache.hpp"
+using namespace susu_tools;
+
+int main()
+{
+    susu_cache< Example  >  cache;    // the key type is string, the value type is xxx
+
+    string key;
+
+    Example value;
     
-using susu_tools::cache;        //just use SuSu_Cache
+    //execute by left-value
+    cache.add(key,value);
+    cache.find(key);
+    cache.update(key,value);
+    cache.remove(key);
     
-cache<class_name> store;        //build your_cache;
-    
-class_name object;              //construct your object
-    
-store.add( "key" , object );    //store a [Copy Of Object] into cache
-store.add( "key" , &object );   //you also can provide a pointer
+    //execute by right-value
+    cache.add( move(key) , move(value) );
+    cache.find( move(key) );
+    cache.update( move(key) , move(value) );
+    cache.remove( move(key) );
 
-class_name ret = store.get( "key" ); //get a [Copy Of Object] from cache
+    //execute by pointer
+    cache.add( &key , &value);
+    cache.find( &key );
+    cache.update( &key , &value);
+    cache.remove( &key );
+}
 
 ```
+## The difference of executing type
 
-Executing the **store.add()** function will not affect the object.
+**execute by left-value:** The object will build by Copy Constructor.
 
-Because the cache will **construct a new object** (construct by copy constructor) and insert it into the cache. 
+watch out,Maybe Copy Constructor will do some bad on your heap-area.
 
-When you execute **store.get()**,the cache will also return a new object (construct by copy constructor).
+**execute by right-value:** The object will build by Move Constructor.
 
-If there are some problem about "DEEP COPY" , you should solve it by yourself.
+watch out,It's easy to make a nullptr when using the move().
 
-***( In most of times,If your object needs to manipulate the heap (such as MALLOC FREE NEW DELETE) ,you should prepare a Copy Constructor for it. )***
+**execute by left-value:** Almost equal to [execute by right-value].
 
+## Something about design
 
-After you execute **add_swap()**,the key and value will be inserted to cache successful,**But the pointer becomes NULL**,just like **std::move**.
+In old design,the template was used like this:
 
-In my views,you can follow these tips to check what function you need to use:
+```cpp
+class susu_cache{
+public:
 
-**add + get:**every object in cache can be use lot's of times.
-
-**add + get_swap:**every object in cache can be use only once.
-
-**add_swap:**replace "add" when you want to avoid copy constructor.
-
-##How to compile
-I provide a test example,You can refer it.
+	template<class T>
+	int add(string& key,T && object)	//	object is Rvalue-ref
+	{
+        //add a key-value into cache
+	}
+}
 ```
-make test
+
+It's easy to use,but sometimes it can also leading people to confusion.
+
+So I fix the design like this:
+
+```cpp
+
+template<class T>
+class susu_cache{
+public:
+	int add(string& key,T && object)	//	object is Rvalue-ref
+	{
+        //add a key-value into cache
+	}
+}
 ```
-or
-```
-g++ main.cpp -o example.bin
-./example.bin
-```
-Before your coding,you should run the test exapmle at first.
-
-##Project details
-The SuSu_Cache is composed of list and map.
-
-**map:** to store meta data.
-
-**list:** to store real data.
-
-When you remove a value by key,you just remove the key(meta data) from map.
-
-The value(real data) still stored by list,**but you can't find it**,Because you had lost the meta data.
-
-When you execute some function like **free_data()**,the value will be removed from list.
-
-Maybe the data structure will change in the future, but the overall design will remain the same.
-Because I think this design will help us to make some performance optimization
+We must specify the type of key now.
