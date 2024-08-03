@@ -2,10 +2,10 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#include "susu_initparam.hpp"
+#include "susu_init-param.hpp"
 #include "susu_socket.hpp"
 #include "susu_epoll.hpp"
-
+#include "susu_thread-pool.hpp"
 
 #include <iostream>
 #include <vector>
@@ -19,13 +19,20 @@ int main(int argc,char** argv)
             printf("too less param\n");
             return 0;
     }
+
+    //get the params
     auto ins = susu_initparam::get_Init_Param_instance();
 
     cout<<"load param file:"<<argv[1]<<endl;
     ins->load_init_param(argv[1]);
     cout<<endl;
 
+	//set the threads    
+	int thread_count = stoi(ins->get_value("thread_init_count"));
+	susu_thread_pool::set_init_count(thread_count);
+	susu_thread_pool* tp = susu_thread_pool::get_susu_thread_pool();
 
+	//set the socket
 	int server_socket = -1;// fd;
 	int port = stoi(ins->get_value("port"));
 

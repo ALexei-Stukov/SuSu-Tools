@@ -104,8 +104,8 @@ test-task-queue:$(TEST)test-task-queue.cpp
 #---------------------------------------------------
 #	some useful application.
 #
-test-httpd:init-param.o $(susu_httpd)susu_httpd.cpp
-	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init_param.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_EPOLL -o $(BIN)susu_httpd.bin $(LD)	
+test-httpd:INIT-PARAM $(susu_httpd)susu_httpd.cpp
+	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init-param.o $(TEMP)susu_thread-worker.o $(TEMP)susu_thread-pool.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_epoll.o -o $(BIN)susu_httpd.bin $(LD)	
 	cp $(susu_httpd)/susu_httpd.conf $(BIN)
 	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
 
