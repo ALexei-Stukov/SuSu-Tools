@@ -17,7 +17,7 @@ endif
 
 all:folder_check SUSU_TOOLS TEST_ALL
 
-SUSU_TOOLS:TIMER CACHE INIT-PARAM HTTP SOCKET THREAD-WORKER THREAD-POOL EPOLL
+SUSU_TOOLS:TIMER CACHE INIT-PARAM HTTP-OBJECT SOCKET THREAD-WORKER THREAD-POOL EPOLL
 #---------------------------------------------------
 #	SUSU_TOOLS
 TIMER:
@@ -36,8 +36,8 @@ INIT-PARAM:CACHE
 	cd $(susu_init-param) && $(MAKE) all ROOT=$(ROOT);
 	cd ../
 
-HTTP:
-	cd $(susu_net-protocol) && $(MAKE) susu_http.o ROOT=$(ROOT);
+HTTP-OBJECT:
+	cd $(susu_net-protocol) && $(MAKE) susu_http-object.o ROOT=$(ROOT);
 	cd ../
 
 SOCKET:
@@ -104,10 +104,10 @@ test-task-queue:$(TEST)test-task-queue.cpp
 #---------------------------------------------------
 #	some useful application.
 #
-test-httpd:INIT-PARAM $(susu_httpd)susu_httpd.cpp
-	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init-param.o $(TEMP)susu_thread-worker.o $(TEMP)susu_thread-pool.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_epoll.o -o $(BIN)susu_httpd.bin $(LD)	
-	cp $(susu_httpd)/susu_httpd.conf $(BIN)
-	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
+#test-httpd:INIT-PARAM $(susu_httpd)susu_httpd.cpp
+#	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init-param.o $(TEMP)susu_thread-worker.o $(TEMP)susu_thread-pool.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_epoll.o -o $(BIN)susu_httpd.bin $(LD)	
+#	cp $(susu_httpd)/susu_httpd.conf $(BIN)
+#	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
 
 HTTPD:
 
