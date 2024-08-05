@@ -32,14 +32,15 @@ public:
 
 class susu_cache{
 public:
-
 	template<class T>
 	int add(string & key,T && value);	//add a key-value into the cache 
+	template<class T>
+	int add(string && key,T && value);	//add a key-value into the cache 
 
 	template<class T>
-	T* get(string & key);				//get always return the copy of object
+	T* get(string & key);				//get always return the copy of object or nullptr
 	template<class T>
-	T* get(string && key);				//get always return the copy of object
+	T* get(string && key);				//get always return the copy of object or nullptr
 
 	template<class T>
 	int update(string & key,T && value);	//remove old k-v and insert new k-v
@@ -74,6 +75,11 @@ int susu_cache::add(string & key,T && value)
 {
 	return add_kv(move(key),forward<T>(value));	//perfect forward
 }
+template<class T>
+int susu_cache::add(string && key,T && value)
+{
+	return add_kv(move(key),forward<T>(value));	//perfect forward
+}
 
 template<class T>
 int susu_cache::add_kv(string && key,T & value)
@@ -90,7 +96,6 @@ int susu_cache::add_kv(string && key,T & value)
 
 	T* data = new T();
 	*data = value;
-	//std::cout<<"the key is"<<key<<"the value is"<<data<<std::endl;
 	data_unit temp = {(void *)(data),true};
 	data_store.insert(pair<string,data_unit>(move(key),temp));
 	return SUCCESS;
@@ -111,7 +116,6 @@ int susu_cache::add_kv(string&& key,T && value)
 
 	T* data = new T();
 	*data = move(value);
-	//std::cout<<"the key is"<<key<<"the value is"<<data<<std::endl;
 	data_unit temp = {(void *)(data),true};
 	data_store.insert(pair<string,data_unit>(move(key),temp));
 	return SUCCESS;
@@ -146,7 +150,7 @@ int susu_cache::update(string && key,T && value)
 }
 
 template<class T>
-T* susu_cache::get(string & key)				//get always return the copy of object
+T* susu_cache::get(string & key)				//get always return the copy of object or nullptr
 {
 	if( find(key) == KEY_NOT_FOUND )
 	{
@@ -162,7 +166,7 @@ T* susu_cache::get(string & key)				//get always return the copy of object
 }
 
 template<class T>
-T* susu_cache::get(string && key)				//get always return the copy of object
+T* susu_cache::get(string && key)				//get always return the copy of object or nullptr
 {
 	if( find(key) == KEY_NOT_FOUND )
 	{

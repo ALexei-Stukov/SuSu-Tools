@@ -32,52 +32,32 @@ So I design this tools for myself.
 just like this:
 
 ```cpp
+
 #include "susu_cache.hpp"
+#include <iostream>
+
+using namespace std;
 using namespace susu_tools;
 
 int main()
 {
-    susu_cache< Example  >  cache;    // the key type is string, the value type is xxx
+    susu_cache cache;
 
-    string key;
+    string key = "111";
+    cache.add(key,5);
 
-    Example value;
+    if(SUCCESS == cache.find("111"))
+	{	
+		cout<<"when the key=111,the value is:"<<*(cache.get<int>("111"))<<endl;
+	}
     
-    //execute by left-value
-    cache.add(key,value);
-    cache.find(key);
-    cache.update(key,value);
-    cache.remove(key);
-    
-    //execute by right-value
-    cache.add( move(key) , move(value) );
-    cache.find( move(key) );
-    cache.update( move(key) , move(value) );
-    cache.remove( move(key) );
-
-    //execute by pointer
-    cache.add( &key , &value);
-    cache.find( &key );
-    cache.update( &key , &value);
-    cache.remove( &key );
+    return 0;
 }
 
 ```
-## The difference of executing type
+## The KEY POINT of functions:
 
-**execute by left-value:** The object will build by Copy Constructor.
-
-watch out,Maybe Copy Constructor will do some bad on your heap-area.
-
-**execute by right-value:** The object will build by Move Constructor.
-
-watch out,It's easy to make a nullptr when using the move().
-
-**execute by left-value:** Almost equal to [execute by right-value].
-
-## Something about design
-
-In old design,the template was used like this:
+**constructor:** We don't need to specify the type of value in constructor.Because I use templates for functions.
 
 ```cpp
 class susu_cache{
@@ -86,24 +66,88 @@ public:
 	template<class T>
 	int add(string& key,T && object)	//	object is Rvalue-ref
 	{
-        //add a key-value into cache
+                //add a key-value into cache
 	}
 }
 ```
+This may not be the best design, but it is very convenient.
 
-It's easy to use,but sometimes it can also leading people to confusion.
+## The Tpye of KEY and VALUE
+These are all the important codes:
 
-So I fix the design like this:
+```cpp
+	template<class T>
+	int add(string & key,T && value);	//add a key-value into the cache 
+	template<class T>
+	int add(string && key,T && value);	//add a key-value into the cache 
+
+	template<class T>
+	T* get(string & key);				//get always return the copy of object or nullptr
+	template<class T>
+	T* get(string && key);				//get always return the copy of object or nullptr
+
+	template<class T>
+	int update(string & key,T && value);	//remove old k-v and insert new k-v
+	template<class T>
+	int update(string && key,T && value);	//remove old k-v and insert new k-v
+
+    int find(string & key);			//check if the data_store have such a key
+	int find(string && key);		//check if the data_store have such a key
+
+    int remove(string & key);		//remove a key-value,this function will delete the value. 
+	int remove(string && key);		//remove a key-value,this function will delete the value.
+``` 
+
+For **key** and **value**, we can use left-values ​​and right-values.
+
+The difference between key and value is:
+
+The **value** is made by template,So it's easy to process left-values and right-values in 1 function.
+
+But **key** must be string,it can't process left-values and right-values in 1 function,So I had to build 2 functions to process left-values and right-values.
+
+## The details of functions:
+
+**add:** This function will return:
+
+```cpp
+    OUT_OF_LIMIT;       //when the count of data_store is out of limit.add failed.
+	
+    KEY_HAD_EXIST;      //the key had exist.add failed.
+	
+    SUCCESS;     //add success.
+```
+
+**find:** This function will return:
 
 ```cpp
 
-template<class T>
-class susu_cache{
-public:
-	int add(string& key,T && object)	//	object is Rvalue-ref
-	{
-        //add a key-value into cache
-	}
-}
+    KEY_NOT_FOUND;      //no such key in data_store
+	
+    SUCCESS;     //find the key success.
 ```
-We must specify the type of key now.
+
+**get:** This function will return:
+
+```cpp
+
+    nullptr;      //no such key in data_store,return nullptr
+	
+    T* The_pointer_of_new_object;     //return a copy of object by pointer.
+```
+
+**remove:** This function will return:
+
+```cpp
+    KEY_NOT_FOUND;      //no such key in data_store,can't remove anything.
+	
+    SUCCESS;     //remove successfully.
+```
+
+**update:** This function will return:
+
+```cpp
+    KEY_NOT_FOUND;      //no such key in data_store,can't update anything.
+	
+    SUCCESS;     //update successfully.
+```
