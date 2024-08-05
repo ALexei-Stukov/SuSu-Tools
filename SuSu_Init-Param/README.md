@@ -12,7 +12,7 @@ path=./
 version=0.1
 limit=71231
 ```
-The key and value will be read by string.And you can read the value by this way:
+The key and value will be read as string.And you can read the value by this way:
 ```cpp
 	auto ins = susu_initparam::get_Init_Param_instance();
 	string name = ins->get_value("name");
