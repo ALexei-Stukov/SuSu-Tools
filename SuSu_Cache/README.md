@@ -91,11 +91,11 @@ These are all the important codes:
 	template<class T>
 	int update(string && key,T && value);	//remove old k-v and insert new k-v
     
-    int find(string & key);			//check if the data_store have such a key
-    int find(string && key);		//check if the data_store have such a key
+	int find(string & key);			//check if the data_store have such a key
+	int find(string && key);		//check if the data_store have such a key
 
-    int remove(string & key);		//remove a key-value,this function will delete the value. 
-    int remove(string && key);		//remove a key-value,this function will delete the value.
+	int remove(string & key);		//remove a key-value,this function will delete the value. 
+	int remove(string && key);		//remove a key-value,this function will delete the value.
 ``` 
 
 For **key** and **value**, we can use left-values ​​and right-values.
