@@ -14,52 +14,18 @@ using namespace std;
 
 void print_time(susu_timer timer)
 {
-	//timeval ret = timer.get_difference();
-	//printf("the time difference is %ld sec %ld ms %ld us\n",ret.tv_sec,ret.tv_usec/1000,ret.tv_usec%1000);
 	cout<<"the time differenct is "<<timer.get_difference_ms()<<" ms"<<endl;
 }
 void print_cache_message(susu_cache& Cache)
 {
-	//cout<<"the map.size() in Cache is:"<<Cache.get_meta_store_size()<<endl;
-	cout<<"the list.size() in Cache is:"<<Cache.get_data_store_size()<<endl;
-	cout<<endl;
+	cout<<"the list.size() in Cache is:"<<Cache.get_current_count()<<endl;
 }
 
 long long algorithm(long long N,int P)
 {
 	int LIMIT = 80145621;
 	long long ret = N;
-	
-	/*  algorithm 1:
-	 * 	 POW(N,P) % LIMIT
-	 *
-	 *  this algorithm is very fast,
-	 *
-	 *  the Key of SuSu Cache is std::string , In this algorithm , SuSu Cache cannot help you.
-	 *
-	int times = P - 1;
-	while(times > 0)
-	{
-		if( times % 2 == 0 )
-		{
-			ret = (ret*ret) % LIMIT;
-			times /= 2;
-		}
-		else
-		{
-			ret = (ret*N) % LIMIT;
-			times -= 1;
-		}
-	}*/
 
-	/* algorithm 2:
-	 * 	A[n] = ( POW(A[n-1],2)-P ) % LIMIT
-	 *
-	 * In this algorithm,SuSu Cache is effective.
-	 *
-	 * This algorithm is very effective when the data size is small and the number of repetitions is high.
-	 *
-	 * */
 	for(int loop = 0 ;loop < P;loop++)
 	{
 		ret = ((ret*ret)-P) % LIMIT;
@@ -83,9 +49,6 @@ long long func_without_cache()
 		long long temp = algorithm(N,P)% 123456789;
 		ret += temp;
 		ret %= 1189467205234;
-		//Cache.add(key,temp);
-		//Cache.add_kv(std::move(key),&temp);
-
 	}
 	return ret;
 }
@@ -98,13 +61,11 @@ long long func_with_cache()
 	{
 		int N = rand()%1000;
 		int P = rand()%1000;
-		//string key = to_string(N) + ":" + to_string(P);
 		string key = to_string(N*1000+P);
 		string k = key;
 		
-		if(SUCCESS == Cache.find_key(std::move(key)))
+		if(SUCCESS == Cache.find(std::move(key)))
 		{	
-			//ret += *(Cache.get(key))% 123456789;
 			ret += *(Cache.get<long long>(std::move(k)))% 123456789;
 		}
 		else
@@ -112,8 +73,7 @@ long long func_with_cache()
 			long long temp = algorithm(N,P)% 123456789;
 			ret += temp;
 			ret %= 1189467205234;
-			//Cache.add(key,temp);
-			Cache.add<long long>(std::move(k),&temp);
+			Cache.add(std::move(k),temp);
 		}
 	}
 	return ret;

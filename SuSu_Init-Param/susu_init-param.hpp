@@ -22,24 +22,25 @@ namespace susu_tools{
 
 class susu_initparam{
 public:
-    static susu_initparam* get_Init_Param_instance();
-    static ::std::mutex init_mutex;
-    
-    int load_init_param(const char* str);  //load param from a file.
-    void init_param_print();    //print on stdout at once
+		static susu_initparam* get_Init_Param_instance();
+		static ::std::mutex init_mutex;
+		
+		int load_init_param(const char* str);  //load param from a file.
+		void init_param_print();		//print on stdout at once
 
-    string get_value(string key);	//get value from cache
+		string get_value(string key);	//get value from cache
 
-    void print_a_log_line(const char* str)
-    {
-        perror(str);   //print something to stderr
-    };
+		void print_a_log_line(const char* str)
+		{
+	        perror(str);   //print something to stderr
+		};
 
 private:
-    susu_cache init_param;
-    susu_initparam();
-    ~susu_initparam();
+		susu_cache init_param;
+		susu_initparam();
+		~susu_initparam();
 };
 
 }//namespace susu_tools
 #endif
+		

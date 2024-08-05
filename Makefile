@@ -53,7 +53,7 @@ THREAD-POOL:TIMER
 
 #---------------------------------------------------
 #	TEST_ALL
-TEST_ALL:folder_check test-cache test-cache-algo test-init-param test-epoll
+TEST_ALL:folder_check test-cache test-cache-algo test-init-param test-thread-pool test-task-queue 
 #---------------------------------------------------
 #	test for some tools.
 
@@ -80,7 +80,7 @@ test-cache-algo:TIMER CACHE $(TEST)test-cache-algo.cpp
 #	nohup $(BIN)test-http.bin > ./bin/test-http.log &
 
 
-test-thread-pool:THREAD-POLL $(TEST)test-thread-pool.cpp
+test-thread-pool:THREAD-POOL $(TEST)test-thread-pool.cpp
 	$(BUILD) $(TEST)test-thread-pool.cpp $(TEMP)susu_thread-pool.o $(TEMP)susu_thread-worker.o $(TEMP)susu_TIMER -o $(BIN)test-thread.bin $(LD)
 	$(BIN)test-thread.bin
 
