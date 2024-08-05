@@ -10,7 +10,7 @@ susu_epoll::susu_epoll(int limit)
 		limit = MAX_EVENTS;
 	}
 	
-    epoll_limit = limit;
+	epoll_limit = limit;
    	epoll_count = 0;
 
 
@@ -20,11 +20,11 @@ susu_epoll::susu_epoll(int limit)
 	
 	//if init success,the epoll_fd != -1
 	if(epoll_fd == -1)
-    {
-        fprintf(stderr,"fail in epoll init\n");
-    }
+	{
+		fprintf(stderr,"fail in epoll init\n");
+	}
 }
-    	
+		
 
 susu_epoll::~susu_epoll()
 {
@@ -51,36 +51,36 @@ int susu_epoll::add_an_event(int fd,int linsten_param)
 {
 	if(epoll_count + 1 < epoll_limit)
 	{
-        struct epoll_event* event = (struct epoll_event*)malloc(sizeof(epoll_event));   //must use malloc to build a epoll_event struct
+		struct epoll_event* event = (struct epoll_event*)malloc(sizeof(epoll_event));   //must use malloc to build a epoll_event struct
 
 		event->events = linsten_param;	//If listem_param = EPOLLIN|EPOLLOUT|EPOLLPRI|EPOLLERR|EPOLLHUP|EPOLLET|EPOLLRDHUP|EPOLLONESHOT
 										//That means this epoll_event will listen all kinds of events.
-	    event->data.fd = fd;
-        if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, event->data.fd,event) != -1)
-	    {
-        	epoll_count++;
-	    }
-        else
-        {
-        	free(event);
-        	fprintf(stderr, "Failed to add file descriptor to epoll\n");
+		event->data.fd = fd;
+		if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, event->data.fd,event) != -1)
+		{
+			epoll_count++;
+		}
+		else
+		{
+			free(event);
+			fprintf(stderr, "Failed to add file descriptor to epoll\n");
 
-        	return -1;
-        }
-        return 0;
-    }
-    else
-    {
-        fprintf(stderr, "to much socket in epoll\n");
-        
-        return -1;
-    }
+			return -1;
+		}
+		return 0;
+	}
+	else
+	{
+		fprintf(stderr, "to much socket in epoll\n");
+		
+		return -1;
+	}
 }
 
 int susu_epoll::get_epoll_result(int ms_count)
 {
 	int event_count = epoll_wait(epoll_fd,EVENTS, MAX_EVENTS,ms_count);  // wait for xxx ms
-    return event_count;
+	return event_count;
 }
 struct epoll_event* susu_epoll::get_enents_array()
 {

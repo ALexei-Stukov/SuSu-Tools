@@ -8,7 +8,7 @@ This tool contains some common operationsto to help us using the epoll function.
 
 This tool is hard to test,so I always add it into another tool,and test the another one.
 
-## How to use this tool.
+## How to use this tool
 
 In most of times,you can use this tool like this:
 
