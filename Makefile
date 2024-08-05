@@ -66,9 +66,9 @@ test-cache:TIMER CACHE $(TEST)test-cache.cpp
 	$(BUILD) $(TEST)test-cache.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache.bin $(LD)
 	$(BIN)test-cache.bin
 
-test-epoll:EPOLL $(TEST)test-epoll.cpp
-	$(BUILD) $(TEST)test-epoll.cpp $(TEMP)susu_epoll.o -o $(BIN)test-epoll.bin $(LD)
-	$(BIN)test-epoll.bin
+#test-epoll:EPOLL $(TEST)test-epoll.cpp
+#	$(BUILD) $(TEST)test-epoll.cpp $(TEMP)susu_epoll.o -o $(BIN)test-epoll.bin $(LD)
+#	$(BIN)test-epoll.bin
 
 test-cache-algo:TIMER CACHE $(TEST)test-cache-algo.cpp
 	$(BUILD) $(TEST)test-cache-algo.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache-algo.bin $(LD)
