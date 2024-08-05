@@ -45,11 +45,11 @@ int main()
 
     string key = "111";
     cache.add(key,5);
-
+    
     if(SUCCESS == cache.find("111"))
-	{	
-		cout<<"when the key=111,the value is:"<<*(cache.get<int>("111"))<<endl;
-	}
+    {	
+        cout<<"when the key=111,the value is:"<<*(cache.get<int>("111"))<<endl;
+    }
     
     return 0;
 }
@@ -90,12 +90,12 @@ These are all the important codes:
 	int update(string & key,T && value);	//remove old k-v and insert new k-v
 	template<class T>
 	int update(string && key,T && value);	//remove old k-v and insert new k-v
-
+    
     int find(string & key);			//check if the data_store have such a key
-	int find(string && key);		//check if the data_store have such a key
+    int find(string && key);		//check if the data_store have such a key
 
     int remove(string & key);		//remove a key-value,this function will delete the value. 
-	int remove(string && key);		//remove a key-value,this function will delete the value.
+    int remove(string && key);		//remove a key-value,this function will delete the value.
 ``` 
 
 For **key** and **value**, we can use left-values ​​and right-values.
