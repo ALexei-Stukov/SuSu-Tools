@@ -19,9 +19,9 @@ using std::string;
 
 namespace susu_tools{
 
-class susu_http_analyser{
+class susu_http_processer{
 public:
-	susu_http_analyser(int fd);	//we should get the fd at first
+	susu_http_processer(int fd);	//we should get the fd at first
 	int get_fd();		//return the fd
 				
 	int get_a_line();//get a line from http request,the line must be end with \r\n

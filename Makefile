@@ -17,7 +17,7 @@ endif
 
 all:folder_check SUSU_TOOLS TEST_ALL
 
-SUSU_TOOLS:TIMER CACHE INIT-PARAM HTTP-OBJECT SOCKET THREAD-WORKER THREAD-POOL EPOLL
+SUSU_TOOLS:TIMER CACHE INIT-PARAM TCP-OBJECT HTTP-OBJECT SOCKET THREAD-WORKER THREAD-POOL EPOLL 
 #---------------------------------------------------
 #	SUSU_TOOLS
 TIMER:
@@ -36,8 +36,12 @@ INIT-PARAM:CACHE
 	cd $(susu_init-param) && $(MAKE) all ROOT=$(ROOT);
 	cd ../
 
-HTTP-OBJECT:
-	cd $(susu_net-protocol) && $(MAKE) susu_http-object.o ROOT=$(ROOT);
+TCP-OBJECT:
+	cd $(susu_net-protocol) && $(MAKE) susu_tcp-object.o ROOT=$(ROOT);
+	cd ../
+
+HTTP-PROCESSER:
+	cd $(susu_net-protocol) && $(MAKE) susu_http-processer.o ROOT=$(ROOT);
 	cd ../
 
 SOCKET:

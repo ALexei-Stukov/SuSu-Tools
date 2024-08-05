@@ -1,4 +1,4 @@
-#include "susu_http-analyser.hpp"
+#include "susu_http-processer.hpp"
 #include <iostream>
 
 namespace susu_tools{
@@ -25,18 +25,18 @@ namespace susu_tools{
 */
 
 
-susu_http_analyser::susu_http_analyser(int fd)
+susu_http_processer::susu_http_processer(int fd)
 {
 	this->fd = fd;
 }
 
-int susu_http_analyser::get_fd()
+int susu_http_processer::get_fd()
 {
 	return fd;
 }
 
 /*//used by other function
-int susu_http_analyser::fd_write(const char * buffer,size_t n)
+int susu_http_processer::fd_write(const char * buffer,size_t n)
 {
 	if(fd>0)
 	{
@@ -49,7 +49,7 @@ int susu_http_analyser::fd_write(const char * buffer,size_t n)
 }
 
 //used by other function
-int susu_http_analyser::fd_read(char * buffer,size_t n)
+int susu_http_processer::fd_read(char * buffer,size_t n)
 {
 	if(fd>0)
 	{
@@ -62,7 +62,7 @@ int susu_http_analyser::fd_read(char * buffer,size_t n)
 	}
 }*/
 
-void susu_http_analyser::get_request_and_header()
+void susu_http_processer::get_request_and_header()
 {
 	int numchars = get_a_line(); //get the head of http request in buffer
 		
@@ -117,7 +117,7 @@ void susu_http_analyser::get_request_and_header()
 		}
 }
 
-int susu_http_analyser::get_a_line()
+int susu_http_processer::get_a_line()
 {
 	int length = 0;
 	char ch = '\0';
@@ -168,14 +168,14 @@ int susu_http_analyser::get_a_line()
 }
 
 
-void susu_http_analyser::clear_head_message()
+void susu_http_processer::clear_head_message()
 {
 	method[0] = '\0';
 	url[0] = '\0';
 	version[0] = '\0';
 }
 
-bool susu_http_analyser::check_all_space(char* str) //check if all the char is space
+bool susu_http_processer::check_all_space(char* str) //check if all the char is space
 {
 	bool ret = true;
 	for(int i=0;i<strlen(str);i++)
@@ -189,7 +189,7 @@ bool susu_http_analyser::check_all_space(char* str) //check if all the char is s
 }
 
 /*
-bool susu_http_analyser::str_end_with(char* input,char* end)  //检查某个字符串A 是否以 某个字符串B结尾
+bool susu_http_processer::str_end_with(char* input,char* end)  //检查某个字符串A 是否以 某个字符串B结尾
 {
 	int i = strlen(input);
 	int j = strlen(end);
