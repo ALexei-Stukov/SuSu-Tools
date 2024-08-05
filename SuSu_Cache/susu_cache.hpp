@@ -47,10 +47,10 @@ public:
 	template<class T>
 	int update(string && key,T && value);	//remove old k-v and insert new k-v
 
-    int find(string & key);			//check if the data_store have such a key
+	int find(string & key);			//check if the data_store have such a key
 	int find(string && key);			//check if the data_store have such a key
 
-    int remove(string & key);		//remove a key-value,this function will delete the value. 
+	int remove(string & key);		//remove a key-value,this function will delete the value. 
 	int remove(string && key);		//remove a key-value,this function will delete the value. 
 
 	long long get_current_count();
