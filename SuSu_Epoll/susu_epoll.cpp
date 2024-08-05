@@ -47,13 +47,14 @@ int susu_epoll::get_event_limit()
 	return epoll_limit;
 }
 
-int susu_epoll::add_a_event(int fd)
+int susu_epoll::add_an_event(int fd,int linsten_param)
 {
 	if(epoll_count + 1 < epoll_limit)
 	{
         struct epoll_event* event = (struct epoll_event*)malloc(sizeof(epoll_event));   //must use malloc to build a epoll_event struct
-	   	
-	    event->events = EPOLLIN|EPOLLERR|EPOLLHUP|EPOLLET|EPOLLRDHUP;
+
+		event->events = linsten_param;	//If listem_param = EPOLLIN|EPOLLOUT|EPOLLPRI|EPOLLERR|EPOLLHUP|EPOLLET|EPOLLRDHUP|EPOLLONESHOT
+										//That means this epoll_event will listen all kinds of events.
 	    event->data.fd = fd;
         if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, event->data.fd,event) != -1)
 	    {
@@ -80,6 +81,10 @@ int susu_epoll::get_epoll_result(int ms_count)
 {
 	int event_count = epoll_wait(epoll_fd,EVENTS, MAX_EVENTS,ms_count);  // wait for xxx ms
     return event_count;
+}
+struct epoll_event* susu_epoll::get_enents_array()
+{
+	return EVENTS;
 }
 
 }//namespace susu_tools

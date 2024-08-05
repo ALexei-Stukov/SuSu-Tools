@@ -43,13 +43,15 @@ public:
 	int get_current_event_count();	//get the current fd counts.
 	int get_event_limit();			//The MAX fd count can be listened by a SuSu_Epoll object.(event is created by fd).
 
-	int check_epoll_fd();	//check the epoll_fd is useful or not
-
-	int add_an_event(int fd);	//add a fd to epoll struct.
-				  				//in most of times,this function will be call by other codes.
+	int add_an_event(int fd,int linsten_param);		//add a fd to epoll struct.
+				  									//in most of times,this function will be call by other codes.
+													//If listem_param = EPOLLIN|EPOLLOUT|EPOLLPRI|EPOLLERR|EPOLLHUP|EPOLLET|EPOLLRDHUP|EPOLLONESHOT
+													//That means this epoll_event will listen all kinds of events.
 
 	int get_epoll_result(int ms_count);	//get some event from fd,and store the event in array EVENTS;
 										//if ms_count = -1, keep waiting
+
+	struct epoll_event* get_enents_array();		//get the array of EVENTS
 private:
 	int epoll_fd;		//	instance of epoll_struct
 	int epoll_count;	//	current event count
@@ -65,7 +67,7 @@ private:
 /*
 	EPOLLIN：触发该事件，表示对应的文件描述符上有可读数据。(包括对端SOCKET正常关闭)；
 	EPOLLOUT：触发该事件，表示对应的文件描述符上可以写数据；
-	EPOLLPRI：表示对应的文件描述符有紧急的数据可读（这里应该表示有带外数据到来）；
+	EPOLLPRI：表示对应的文件描述符出现了一些紧急状况，在TCP连接中，可能指的是带外数据（比较复杂，需要参考一些资料）；
 	EPOLLERR：表示对应的文件描述符发生错误；
 	EPOLLRDHUP; 表示对等关闭
 	EPOLLHUP：表示对应的文件描述符被挂断；
