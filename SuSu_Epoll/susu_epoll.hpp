@@ -45,7 +45,7 @@ public:
 
 	int check_epoll_fd();	//check the epoll_fd is useful or not
 
-	int add_a_event(int fd);	//add a fd to epoll struct.
+	int add_an_event(int fd);	//add a fd to epoll struct.
 				  				//in most of times,this function will be call by other codes.
 
 	int get_epoll_result(int ms_count);	//get some event from fd,and store the event in array EVENTS;
