@@ -8,21 +8,18 @@
 #define KEY_NOT_FOUND 8
 #define KEY_HAD_EXIST 16
 
-#include <list>
+
 #include <iostream>
-//#include <map>
 #include <unordered_map>
 #include <string>
-//#include <mutex>
 #include <queue>
 
 using std::string;
-using std::list;
-//using std::map;
 using std::unordered_map;
+using std::is_lvalue_reference;
+using std::forward;
 using std::pair;
-//using std::mutex;
-using std::queue;
+using std::move;
 
 namespace susu_tools{
 
@@ -32,106 +29,154 @@ public:
 	bool flag;	// to decide if this data can be read or not
 };
 
+
 class susu_cache{
 public:
-	int find_key(string& key);	// check a key is exist or not;
-	int find_key(string&& key);	// rvalue-ref
 
-	int add_kv(string& key,void* data);	// add a k-v to store
-	int add_kv(string&& key,void* data);	// rvalue-ref
+	template<class T>
+	int add(string & key,T && value);	//add a key-value into the cache 
 
-	int update(string& key,void* data);	// remove old data,insert new data
-	int update(string&& key,void* data);	// rvalue-ref
-		
-	int remove(string& key);	// remove old data,insert new data
-	int remove(string&& key);	//rvalue-ref
+	template<class T>
+	T* get(string & key);				//get always return the copy of object
+	template<class T>
+	T* get(string && key);				//get always return the copy of object
 
-	//----------------------------------------------------------
-	template<typename T>
-	int add(string& key,T && object)	//	object is Rvalue-ref
-	{
-		T* input = new T(move(object));
-		return add_kv(key,input);
-	}
-	
-	template<typename T>
-	int add(string& key,T * object)	//	pointer
-	{
-		T* input = new T(*object);
-		return add_kv(key,input);
-	}
+	template<class T>
+	int update(string & key,T && value);	//remove old k-v and insert new k-v
+	template<class T>
+	int update(string && key,T && value);	//remove old k-v and insert new k-v
 
-	template<typename T>
-	int add(string& key,T & object)	//	object is Lvalue-ref
-	{
-		T* input = new T(object);
-		return add_kv(key,input);
-	}
+    int find(string & key);			//check if the data_store have such a key
+	int find(string && key);			//check if the data_store have such a key
 
-	template<typename T>
-	int add(string&& key,T && object)	//rvalue-ref
-	{
-		T* input = new T(move(object));
-		return add_kv(std::move(key),input);
-	}
-	
-	template<typename T>
-	int add(string&& key,T * object)	//rvalue-ref
-	{
-		T* input = new T(*object);
-		return add_kv(std::move(key),input);
-	}
+    int remove(string & key);		//remove a key-value,this function will delete the value. 
+	int remove(string && key);		//remove a key-value,this function will delete the value. 
 
-	template<typename T>
-	int add(string&& key,T & object)	//rvalue-ref
-	{
-		T* input = new T(object);
-		return add_kv(std::move(key),input);
-	}
+	long long get_current_count();
+	long long get_count_limit();
+	int set_count_limit(long long limit);
 
-	
-	
-	template<typename T>
-	T* get(string& key)
-	{
-		if( find_key(key)==FAIL )	//check if the key is exist
-		{
-			return NULL;
-		}
-		else
-		{
-			return (T*)(data_store[key]->data);	//return a Cpoy Of Object
-		}
-	}
-
-	template<typename T>
-	T* get(string&& key)
-	{
-		if( find_key(std::move(key))==FAIL )	//check if the key is exist
-		{
-			return NULL;
-		}
-		else
-		{
-			return (T*)(data_store[key]->data);	//return a Cpoy Of Object
-		}
-	}	
-	//----------------------------------------------------------
-	
-	long long get_data_store_size();
-	
-	long long get_limit();
-	
-	int set_limit(long long limit);
-
-	unordered_map<string,data_unit*>& get_data_store();
+	unordered_map<string,data_unit>& get_data_store();
 
 private:
-	unordered_map<string,data_unit*> data_store;
-	long long limit = 1024*1024*1024;
+	template<class T>
+	int add_kv(string && key,T & value);
+
+	template<class T>
+	int add_kv(string && key,T && value);
+
+	unordered_map<string,data_unit> data_store;
+	long long count_limit = 1024*1024*1024;	//the count limit of k-v
 };
+
+template<class T>
+int susu_cache::add(string & key,T && value)
+{
+	return add_kv(move(key),forward<T>(value));	//perfect forward
+}
+
+template<class T>
+int susu_cache::add_kv(string && key,T & value)
+{
+	if( get_current_count()+1 > get_count_limit())
+	{
+		return OUT_OF_LIMIT;
+	}
+
+	if( find(key) == true )
+	{
+		return KEY_HAD_EXIST;
+	}
+
+	T* data = new T();
+	*data = value;
+	//std::cout<<"the key is"<<key<<"the value is"<<data<<std::endl;
+	data_unit temp = {(void *)(data),true};
+	data_store.insert(pair<string,data_unit>(move(key),temp));
+	return SUCCESS;
+}
+
+template<class T>
+int susu_cache::add_kv(string&& key,T && value)
+{
+	if( get_current_count()+1 > get_count_limit())
+	{
+		return OUT_OF_LIMIT;
+	}
+
+	if( find(key) == true )
+	{
+		return KEY_HAD_EXIST;
+	}
+
+	T* data = new T();
+	*data = move(value);
+	//std::cout<<"the key is"<<key<<"the value is"<<data<<std::endl;
+	data_unit temp = {(void *)(data),true};
+	data_store.insert(pair<string,data_unit>(move(key),temp));
+	return SUCCESS;
+}
+
+template<class T>
+int susu_cache::update(string & key,T && value)
+{
+	if( find(key) == KEY_NOT_FOUND )
+	{
+		return KEY_NOT_FOUND;
+	}
+	else
+	{
+		data_store.erase( key );
+		return add(key,forward<T>(value));
+	}
+}
+
+template<class T>
+int susu_cache::update(string && key,T && value)
+{
+	if( find(key) == KEY_NOT_FOUND )
+	{
+		return KEY_NOT_FOUND;
+	}
+	else
+	{
+		data_store.erase( key );
+		return add(key,forward<T>(value));
+	}
+}
+
+template<class T>
+T* susu_cache::get(string & key)				//get always return the copy of object
+{
+	if( find(key) == KEY_NOT_FOUND )
+	{
+		return nullptr;
+	}
+	else
+	{
+		T* ret = new T();
+		T* temp = (T*)(data_store[key].data);
+		*ret = *temp;
+		return ret;
+	}
+}
+
+template<class T>
+T* susu_cache::get(string && key)				//get always return the copy of object
+{
+	if( find(key) == KEY_NOT_FOUND )
+	{
+		return nullptr;
+	}
+	else
+	{
+		T* ret = new T();
+		T* temp = (T*)(data_store[key].data);
+		*ret = *temp;
+		return ret;
+	}
+}
 
 
 }//namespace susu_tools
 #endif
-
