@@ -47,5 +47,6 @@ INCLUDE := $(foreach n,$(ALL_SOURCE_FOLDER),-I $(n))				# foreach is useful,but 
 #INCLUDE = -I $(susu_timer) -I $(susu_init-param)......
 
 CC=g++ -std=c++11 -pipe -c $(INCLUDE) -O2 -Wall 
-BUILD=g++ -std=c++11 -pipe $(INCLUDE) -O2 -Wall 
+BUILD=g++ -std=c++11 -pipe $(INCLUDE) -O2 -Wall
+DEBUG=g++ -std=c++11 -pipe $(INCLUDE) -O2 -Wall -g
 LD = -pthread

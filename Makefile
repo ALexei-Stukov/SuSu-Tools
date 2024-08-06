@@ -40,8 +40,12 @@ TCP-OBJECT:
 	cd $(susu_net-protocol) && $(MAKE) susu_tcp-object.o ROOT=$(ROOT);
 	cd ../
 
-HTTP-PROCESSER:
+HTTP-PROCESSER:HTTP-ANALYSER EPOLL
 	cd $(susu_net-protocol) && $(MAKE) susu_http-processer.o ROOT=$(ROOT);
+	cd ../
+
+HTTP-ANALYSER:
+	cd $(susu_net-protocol) && $(MAKE) susu_http-analyser.o ROOT=$(ROOT);
 	cd ../
 
 SOCKET:
@@ -108,10 +112,10 @@ test-task-queue:$(TEST)test-task-queue.cpp
 #---------------------------------------------------
 #	some useful application.
 #
-#test-httpd:INIT-PARAM $(susu_httpd)susu_httpd.cpp
-#	$(BUILD) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init-param.o $(TEMP)susu_thread-worker.o $(TEMP)susu_thread-pool.o $(TEMP)susu_cache.o $(TEMP)susu_socket.o $(TEMP)susu_epoll.o -o $(BIN)susu_httpd.bin $(LD)	
-#	cp $(susu_httpd)/susu_httpd.conf $(BIN)
-#	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
+test-httpd:INIT-PARAM TCP-OBJECT THREAD-WORKER THREAD-POOL HTTP-PROCESSER $(susu_httpd)susu_httpd.cpp
+	$(DEBUG) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init-param.o $(TEMP)susu_thread-worker.o $(TEMP)susu_thread-pool.o $(TEMP)susu_cache.o $(TEMP)susu_tcp-object.o $(TEMP)susu_epoll.o $(TEMP)susu_http-processer.o -o $(BIN)susu_httpd.bin $(LD)	
+	cp $(susu_httpd)susu_httpd.conf $(BIN)
+	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
 
 HTTPD:
 
