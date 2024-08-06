@@ -82,6 +82,21 @@ int susu_epoll::get_epoll_result(int ms_count)
 	int event_count = epoll_wait(epoll_fd,EVENTS, MAX_EVENTS,ms_count);  // wait for xxx ms
 	return event_count;
 }
+
+int susu_epoll::remove_an_event(int fd)
+{
+	if(epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd ,NULL)  != -1)
+    {
+        epoll_count--;
+        close(fd);
+    }
+}
+
+int susu_epoll::get_epoll_fd()
+{
+	return epoll_fd;
+}
+
 struct epoll_event* susu_epoll::get_enents_array()
 {
 	return EVENTS;

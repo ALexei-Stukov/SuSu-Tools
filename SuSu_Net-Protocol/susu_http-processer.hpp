@@ -10,7 +10,9 @@
 #include <sys/socket.h>
 
 #include <iostream>
+#include <queue>
 using std::string;
+using std::queue;
 
 #include "susu_epoll.hpp"
 #include "susu_http-analyser.hpp"
@@ -34,15 +36,21 @@ public:
 	
 	int add_an_event(int fd);
 
+	int remove_an_event(int fd);
+
 	int get_epoll_result(int ms_count);
+
+	int get_fd_queue(int count);
 
 	// functions work with http-analyser
 
+	int process_fd_queue();
 private:
 	susu_epoll	epoll_manager;
+	queue<int>	fd_queue;
 	//susu_http-ayalyser	request_analyser;
 };
 
-int http_work_loop(susu_http_processer* hp);
+int http_work(susu_http_processer* hp);
 
 }//namespace susu_tools

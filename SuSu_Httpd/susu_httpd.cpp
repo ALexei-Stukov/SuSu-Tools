@@ -55,7 +55,7 @@ int main(int argc,char** argv)
         //新建一个epoll对象,每个对象最多管理 Init_Param.epoll_count 个socket
         susu_http_processer* hp = new susu_http_processer(stoi(ins->get_value("epoll_count")));
         //把对象的loop函数作为可执行的task添加到线程池
-        tp->add_task(susu_tools::http_work_loop,hp);
+        tp->add_task(susu_tools::http_work,hp);
         //由于load_balace的设计，每个task都独占1个线程
 
         //把epoll对象添加到vector内，方便管理

@@ -47,9 +47,14 @@ public:
 				  									//in most of times,this function will be call by other codes.
 													//If listem_param = EPOLLIN|EPOLLOUT|EPOLLPRI|EPOLLERR|EPOLLHUP|EPOLLET|EPOLLRDHUP|EPOLLONESHOT
 													//That means this epoll_event will listen all kinds of events.
+	
+	int remove_an_event(int fd);		//close a fd.If this fd didn't cpoyed by some function like dup,
+									//then this fd will be remove from epoll struct automatically 
 
 	int get_epoll_result(int ms_count);	//get some event from fd,and store the event in array EVENTS;
 										//if ms_count = -1, keep waiting
+	
+	int get_epoll_fd();
 
 	struct epoll_event* get_enents_array();		//get the array of EVENTS
 private:
