@@ -50,6 +50,13 @@ int susu_http_processer::get_fd_queue(int count)
 }
 int susu_http_processer::process_fd_queue()
 {
+	while(fd_queue.size() > 0)
+	{
+		int fd = fd_queue.front();
+		fd_queue.pop();
+
+		
+	}
 	return 0;
 }
 
