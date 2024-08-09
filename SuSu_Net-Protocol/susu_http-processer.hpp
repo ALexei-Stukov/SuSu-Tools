@@ -16,8 +16,8 @@ using std::queue;
 
 #include "susu_cache.hpp"
 #include "susu_epoll.hpp"
-#include "susu_http-analyser.hpp"
-
+#include "susu_http-reader.hpp"
+#include "susu_http-writer.hpp"
 
 
 #define line_length_limit 4096
@@ -42,14 +42,10 @@ public:
 	int get_epoll_result(int ms_count);
 
 	int process_fd(int count);
-
-	int http_read();
-	int http_write();
-
 private:
-	susu_epoll	epoll_manager;
-	susu_http_analyser	request_analyser;	//其实这个名称还是有待商榷，这是记录http头的东西。
-	susu_cache	process_script;
+	susu_epoll*	epoll_manager;
+	susu_http_reader	reader;
+	susu_http_writer	writer;
 };
 
 int http_work(susu_http_processer* hp);

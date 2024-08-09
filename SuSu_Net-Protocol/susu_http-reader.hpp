@@ -19,7 +19,7 @@ using std::string;
 
 namespace susu_tools{
 
-class susu_http_analyser{
+class susu_http_reader{
 public:
 	int analyse(int fd);	//analyse a http request
 

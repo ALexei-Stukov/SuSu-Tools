@@ -49,6 +49,7 @@ int main(int argc, char *argv[]) {
     }
 	getchar();
 	getchar();
+	close(fd);
     //recv(fd,buffer, strlen(buffer), 0);
 	//本次包有多少个字节
     return 0;

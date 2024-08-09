@@ -77,10 +77,12 @@ int susu_cache::remove(string && key)
 
 int susu_cache::remove_all()
 {
+	/*
 	auto it = data_store.begin();
 	while(data_store.size() > 0)
 	{
 		data_store.erase(it);
-	}
+	}*/
+	data_store.clear();
 	return SUCCESS;
 }

@@ -1,11 +1,11 @@
-#include "susu_http-analyser.hpp"
+#include "susu_http-reader.hpp"
 #include <iostream>
 
 using namespace susu_tools;
 using std::cout;
 using std::endl;
 
-int susu_http_analyser::analyse(int fd)
+int susu_http_reader::analyse(int fd)
 {
 	head.remove_all();		//clean old data
 	if(get_http_head(fd) == -1)
@@ -46,7 +46,7 @@ int susu_http_analyser::analyse(int fd)
 	return 0;
 }
 /*//used by other function
-int susu_http_analyser::fd_write(const char * buffer,size_t n)
+int susu_http_reader::fd_write(const char * buffer,size_t n)
 {
 	if(fd>0)
 	{
@@ -59,7 +59,7 @@ int susu_http_analyser::fd_write(const char * buffer,size_t n)
 }
 
 //used by other function
-int susu_http_analyser::fd_read(char * buffer,size_t n)
+int susu_http_reader::fd_read(char * buffer,size_t n)
 {
 	if(fd>0)
 	{
@@ -72,7 +72,7 @@ int susu_http_analyser::fd_read(char * buffer,size_t n)
 	}
 }*/
 
-int susu_http_analyser::get_http_head(int fd)
+int susu_http_reader::get_http_head(int fd)
 {
 	int numchars = get_a_http_line(fd);	//get the head of http request in buffer
 		
@@ -111,7 +111,7 @@ int susu_http_analyser::get_http_head(int fd)
 	return 0;
 }
 
-int susu_http_analyser::get_a_http_line(int fd)
+int susu_http_reader::get_a_http_line(int fd)
 {
 	int length = 0;
 	char ch = '\0';
@@ -158,7 +158,7 @@ int susu_http_analyser::get_a_http_line(int fd)
    	return length;
 }
 
-bool susu_http_analyser::check_all_space(char* str) //check if all the char is space
+bool susu_http_reader::check_all_space(char* str) //check if all the char is space
 {
 	bool ret = true;
 	for(int i=0;i<strlen(str);i++)
@@ -172,7 +172,7 @@ bool susu_http_analyser::check_all_space(char* str) //check if all the char is s
 }
 
 /*
-bool susu_http_analyser::str_end_with(char* input,char* end)  //检查某个字符串A 是否以 某个字符串B结尾
+bool susu_http_reader::str_end_with(char* input,char* end)  //检查某个字符串A 是否以 某个字符串B结尾
 {
 	int i = strlen(input);
 	int j = strlen(end);

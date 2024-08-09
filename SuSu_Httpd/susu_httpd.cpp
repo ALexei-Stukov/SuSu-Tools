@@ -71,19 +71,23 @@ int main(int argc,char** argv)
 	while(true)
 	{
     	client_socket = accept(server->get_fd(),(struct sockaddr *)&client_addr,&client_addr_size);
-
+		printf("received a client socket:%d\n",client_socket);
     	if (client_socket != -1)
     	{
 			//主线程将把fd分给 "最空闲"的 http-processer。由于processer内部有一个循环，且一个processer和一个线程绑定，所以最终，也可以认为主线程把fd交给了最空闲、算力最充裕的线程。
+			printf("the target_index = %d\n",target_index);	
 			http_processer_vector[target_index]->add_an_event(client_socket);
-			for(int index = 0;index < http_processer_vector.size();index++)
+			target_index ++;
+			target_index %= stoi(ins->get_value("thread_init_count"));
+			printf("the target_index = %d\n",target_index);	
+			/*for(int index = 0;index < http_processer_vector.size();index++)
 			{
 				if(http_processer_vector[index]->get_current_fd_count() < min_fd_counts)
 				{
 					min_fd_counts = http_processer_vector[index]->get_current_fd_count();
 					target_index = index;
 				}
-			}
+			}*/
     	}
 	}
 	

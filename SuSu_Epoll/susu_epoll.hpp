@@ -37,7 +37,7 @@ namespace susu_tools{
 
 class susu_epoll{
 public:
-	susu_epoll(int limit = MAX_EVENTS);	//limit is a useless param in new Linux Kernel.
+	susu_epoll(int limit/* = MAX_EVENTS*/);	//limit is a useless param in new Linux Kernel.
 	~susu_epoll();
 
 	int get_current_event_count();	//get the current fd counts.
@@ -45,8 +45,7 @@ public:
 
 	int add_an_event(int fd,int linsten_param);		//add a fd to epoll struct.
 				  									//in most of times,this function will be call by other codes.
-													//If listem_param = EPOLLIN|EPOLLOUT|EPOLLPRI|EPOLLERR|EPOLLHUP|EPOLLET|EPOLLRDHUP|EPOLLONESHOT
-													//That means this epoll_event will listen all kinds of events.
+													//in most of times,listem_param = EPOLLIN or EPOLLIN|EPOLLET
 	
 	int remove_an_event(int fd);		//close a fd.If this fd didn't cpoyed by some function like dup,
 										//then this fd will be remove from epoll struct automatically 

@@ -1,4 +1,7 @@
 #include "susu_epoll.hpp"
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
 
 namespace susu_tools{
 
@@ -23,6 +26,7 @@ susu_epoll::susu_epoll(int limit)
 	{
 		fprintf(stderr,"fail in epoll init\n");
 	}
+	printf("I get a epoll_fd:%d\n",epoll_fd);
 }
 		
 
@@ -49,6 +53,7 @@ int susu_epoll::get_event_limit()
 
 int susu_epoll::add_an_event(int fd,int linsten_param)
 {
+	printf("the epoll_fd is %d\n",epoll_fd);
 	if(epoll_count + 1 < epoll_limit)
 	{
 		struct epoll_event* event = (struct epoll_event*)malloc(sizeof(epoll_event));   //must use malloc to build a epoll_event struct
@@ -62,6 +67,8 @@ int susu_epoll::add_an_event(int fd,int linsten_param)
 		}
 		else
 		{
+			printf("errno = %d\n",errno);
+			printf("Error: %s\n", strerror(errno));
 			free(event);
 			fprintf(stderr, "Failed to add file descriptor to epoll\n");
 
@@ -85,16 +92,18 @@ int susu_epoll::get_epoll_result(int ms_count)
 
 int susu_epoll::remove_an_event(int fd)
 {
+	printf("now I try to remove fd %d\n",fd);
 	if(epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd ,NULL)  != -1)
     {
         epoll_count--;
-        close(fd);
+		close(fd);
     }
+	return 0;
 }
 
 int susu_epoll::get_epoll_fd()
 {
-	printf("now the epoll_fd is :%d",epoll_fd);
+	printf("now the epoll_fd is :%d\n",epoll_fd);
 	return epoll_fd;
 }
 
