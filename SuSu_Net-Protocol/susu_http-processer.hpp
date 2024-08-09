@@ -14,6 +14,7 @@
 using std::string;
 using std::queue;
 
+#include "susu_cache.hpp"
 #include "susu_epoll.hpp"
 #include "susu_http-analyser.hpp"
 
@@ -40,15 +41,15 @@ public:
 
 	int get_epoll_result(int ms_count);
 
-	int get_fd_queue(int count);
+	int process_fd(int count);
 
-	// functions work with http-analyser
+	int http_read();
+	int http_write();
 
-	int process_fd_queue();
 private:
 	susu_epoll	epoll_manager;
-	queue<int>	fd_queue;
-	//susu_http-ayalyser	request_analyser;
+	susu_http_analyser	request_analyser;	//其实这个名称还是有待商榷，这是记录http头的东西。
+	susu_cache	process_script;
 };
 
 int http_work(susu_http_processer* hp);

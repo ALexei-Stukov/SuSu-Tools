@@ -94,6 +94,7 @@ int susu_epoll::remove_an_event(int fd)
 
 int susu_epoll::get_epoll_fd()
 {
+	printf("now the epoll_fd is :%d",epoll_fd);
 	return epoll_fd;
 }
 

@@ -21,41 +21,25 @@ namespace susu_tools{
 
 class susu_http_analyser{
 public:
-	susu_http_analyser(int fd);	//we should get the fd at first
-	int get_fd();		//return the fd
-				
-	int get_a_line();//get a line from http request,the line must be end with \r\n
+	int analyse(int fd);	//analyse a http request
+
+	int get_a_http_line(int fd);//get a line from http request,the line must be end with \r\n
 			 //if the size is too long (more than [line_length_limit] ),this function will stop reading and make sure buffer is end with \r\n.
 			 //
 			 //for example:
 			 //	data = "1234567890\n"
 			 //	buf[5];
-			 //	use get_a_line(), then  buf = "12\r\n\0", data = "34567890\r\n"()
+			 //	use get_a_http_line(), then  buf = "12\r\n\0", data = "34567890\r\n"()
 	
-	void get_request_and_header();//read the http request head
+	int get_http_head(int fd);//read the http request head
 	
 	
 	bool check_all_space(char* str); // check if all the char is space in a line
-					 // all space line means the head is end,the next part is body.
-	 
-	void clear_head_message(); // clean all message.
-
-	void write_something(char* buf)
-	{
-		write(fd,buf,sizeof(buf));
-	}
-	
+					 	// all space line means the head is end,the next part is body.
 private:
-	char buffer[line_length_limit];	//the buffer to read request
-		
-		//susu_cache http_request_kv;	//to store all K-V on http head
+	susu_cache	head;	//contain all the k-v from http-head
 
-		//the first line of http head = method + url + version
-	char method[line_length_limit] = {0};
-	char url[line_length_limit] = {0};
-	char version[line_length_limit] = {0};
-	
-	int fd;	// file describe,we should get the fd at first.
+	char buffer[line_length_limit];	//the buffer about http-body	
 };
 
 }//namespace susu_tools

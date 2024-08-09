@@ -73,3 +73,14 @@ int susu_cache::remove(string && key)
 		return SUCCESS;
 	}
 }
+
+
+int susu_cache::remove_all()
+{
+	auto it = data_store.begin();
+	while(data_store.size() > 0)
+	{
+		data_store.erase(it);
+	}
+	return SUCCESS;
+}

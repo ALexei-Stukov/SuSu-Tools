@@ -2,3 +2,4 @@
 *.txt
 temp_file
 bin/
+.vscode

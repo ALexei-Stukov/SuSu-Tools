@@ -51,7 +51,9 @@ public:
 	int find(string && key);			//check if the data_store have such a key
 
 	int remove(string & key);		//remove a key-value,this function will delete the value. 
-	int remove(string && key);		//remove a key-value,this function will delete the value. 
+	int remove(string && key);		//remove a key-value,this function will delete the value.
+
+	int remove_all();	//remove all-key and value 
 
 	long long get_current_count();
 	long long get_count_limit();

@@ -1,4 +1,4 @@
-#define buffersize 1024*1024*128
+#define buffersize 1024*1024
 
 namespace susu_tools{
 

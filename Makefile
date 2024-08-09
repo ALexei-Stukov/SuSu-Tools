@@ -82,9 +82,9 @@ test-cache-algo:TIMER CACHE $(TEST)test-cache-algo.cpp
 	$(BUILD) $(TEST)test-cache-algo.cpp $(TEMP)susu_timer.o $(TEMP)susu_cache.o -o $(BIN)test-cache-algo.bin $(LD)
 	$(BIN)test-cache-algo.bin
 
-#test-http:socket.o http.o $(TEST)test-http-server.cpp $(TEST)test-http-client.cpp
+test-http-client:
 #	$(BUILD) $(TEST)test-http-server.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-server.bin $(LD)
-#	$(BUILD) $(TEST)test-http-client.cpp $(TEMP)susu_http.o $(TEMP)susu_socket.o -o $(BIN)test-http-client.bin $(LD)
+	$(BUILD) $(TEST)test-http-client.cpp $(TEMP)susu_tcp-object.o -o $(BIN)test-http-client.bin $(LD)
 #	nohup $(BIN)test-http.bin > ./bin/test-http.log &
 
 
@@ -113,7 +113,7 @@ test-task-queue:$(TEST)test-task-queue.cpp
 #	some useful application.
 #
 test-httpd:INIT-PARAM TCP-OBJECT THREAD-WORKER THREAD-POOL HTTP-PROCESSER $(susu_httpd)susu_httpd.cpp
-	$(DEBUG) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init-param.o $(TEMP)susu_thread-worker.o $(TEMP)susu_thread-pool.o $(TEMP)susu_cache.o $(TEMP)susu_tcp-object.o $(TEMP)susu_epoll.o $(TEMP)susu_http-processer.o -o $(BIN)susu_httpd.bin $(LD)	
+	$(DEBUG) $(susu_httpd)susu_httpd.cpp $(TEMP)susu_init-param.o $(TEMP)susu_thread-worker.o $(TEMP)susu_thread-pool.o $(TEMP)susu_cache.o $(TEMP)susu_tcp-object.o $(TEMP)susu_epoll.o $(TEMP)susu_http-processer.o $(TEMP)susu_http-analyser.o -o $(BIN)susu_httpd.bin $(LD)	
 	cp $(susu_httpd)susu_httpd.conf $(BIN)
 	$(BIN)susu_httpd.bin $(BIN)susu_httpd.conf
 
