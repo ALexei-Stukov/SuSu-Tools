@@ -21,9 +21,10 @@ int susu_tools::http_work(susu_http_processer* hp)
 	return 0;
 }
 
-susu_http_processer::susu_http_processer(int event_counts_limit)
+susu_http_processer::susu_http_processer(int event_counts_limit,string script_path)
 {
 	epoll_manager = new susu_epoll(event_counts_limit);
+	load_script_list(script_path.c_str());
 }
 
 int susu_http_processer::process_fd(int count)
@@ -48,7 +49,7 @@ int susu_http_processer::process_fd(int count)
 			//正常关闭也会触发EPOLLIN，要做一下区分
 			char ch;
 			int numchars = recv(client_socket, &ch, 1, MSG_PEEK);//试着读一下
-			if( numchars < 0 )
+			if( numchars <= 0 )
 			{
 				//已关闭
             	//关闭该文件描述符并移除
@@ -57,9 +58,35 @@ int susu_http_processer::process_fd(int count)
 			else
 			{
 				reader.analyse(client_socket);	//获得HTTP请求信息，存储在reader内。
-					//根据不同情况，调用不同的函数，产生不同的结果。
-				char* temp = "WDNMD, I had received your request!";
-				writer.write_fd(client_socket,temp,strlen(temp));//把结果发送给调用方
+				//根据不同情况，调用不同的函数，产生不同的结果。
+				if( reader.get_kv_store().find("Method") == SUCCESS )
+				{
+					//以管道形式调用脚本，并接收参数
+					char ret[1024];//文件缓冲区
+					FILE *fp;//文件流
+
+					char exe_cmd[2048];//待执行的命令
+   					//sprintf(exe_cmd,"lua %s/%s %s/%s %s\0",init_param->get_string_value("root_path").c_str(),script_name,init_param->get_string_value("root_path").c_str(),filename,type);
+    				
+					/*
+					string SCRIPT = *(script_list.get<string>("Method"));
+					string ROOT_PATH = ".";	//临时这么弄一下先
+					string FILENAME = "index.html";
+					string TYPE = "/index.html";					
+					sprintf(exe_cmd,"lua ./%s %s/%s %s\0",SCRIPT.c_str(),ROOT_PATH.c_str(),FILENAME.c_str(),TYPE.c_str());
+					*/
+					sprintf(exe_cmd,"lua ./get-test.lua ./index.html /*.html\0");
+					printf("WDNMD\n");
+					fp = popen(exe_cmd,"r");
+					int size = fread(ret,1,1024,fp);
+					while(size > 0)
+    				{
+						writer.write_fd(client_socket,ret,size);//把结果发送给调用方
+        				//printf("%s",ret);
+        				size = fread(ret,1,1024,fp);
+    				}
+   					pclose(fp);				
+				}
 			}
         }
         else
@@ -93,4 +120,61 @@ int susu_http_processer::remove_an_event(int fd)
 int susu_http_processer::get_epoll_result(int ms_count)
 {
 	return epoll_manager->get_epoll_result(ms_count);	
+}
+
+int susu_http_processer::load_script_list(const char* str)  //加载参数
+{
+	try{
+		//open the target file
+		FILE* init_file = fopen(str,"r");
+		char key[128] = {0};
+		char value[1024] = {0};
+		char line[1280] = {0};
+
+		if(init_file != NULL)
+		{
+			memset(key,128,0);
+			memset(value,1024,0);
+			memset(line,1280,0);
+			while(fscanf(init_file,"%s\n",line) != EOF)
+			{
+				int i;
+				int check = 1;
+				for(i=0;i<strlen(line);i++)
+				{
+					if(line[i] == '=' && i <= 128)
+					{
+						strncpy(key,line,i);
+						strncpy(value,line+i+1,strlen(line)-i-1);
+						check = 0;
+						break;
+					}
+					else
+					{
+						check = 1;
+					}
+				}
+				if(check)
+				{continue;}
+				string KEY = key;
+				string VALUE = value;
+		        script_list.add(KEY,VALUE);
+
+				memset(key,0,128);
+				memset(value,0,1024);
+				memset(line,0,1280);
+			}
+		}
+		else
+		{
+			throw "script config is not exist";//throw error
+		}
+			   
+	}
+	catch(const char* error_string)
+	{
+		perror(error_string);
+		exit(-1);
+	}
+	return 0;
 }

@@ -20,9 +20,9 @@ using std::pair;
 
 namespace susu_tools{
 
-class susu_initparam{
+class susu_init_param{
 public:
-		static susu_initparam* get_Init_Param_instance();
+		static susu_init_param* get_Init_Param_instance();
 		static ::std::mutex init_mutex;
 		
 		int load_init_param(const char* str);  //load param from a file.
@@ -37,8 +37,8 @@ public:
 
 private:
 		susu_cache init_param;
-		susu_initparam();
-		~susu_initparam();
+		susu_init_param();
+		~susu_init_param();
 };
 
 }//namespace susu_tools

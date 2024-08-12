@@ -36,6 +36,9 @@ public:
 	
 	bool check_all_space(char* str); // check if all the char is space in a line
 					 	// all space line means the head is end,the next part is body.
+
+	susu_cache& get_kv_store();	//get the cache about head
+	
 private:
 	susu_cache	head;	//contain all the k-v from http-head
 

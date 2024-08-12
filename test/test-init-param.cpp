@@ -13,7 +13,7 @@ int main(int argc,char** argv)
 		printf("too less param\n");
 		return 0;
 	}
-	auto ins = susu_initparam::get_Init_Param_instance();
+	auto ins = susu_init_param::get_Init_Param_instance();
 	
 	cout<<"load param file:"<<argv[1]<<endl;
 	ins->load_init_param(argv[1]);

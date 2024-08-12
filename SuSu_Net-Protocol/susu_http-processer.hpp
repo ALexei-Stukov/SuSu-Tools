@@ -28,7 +28,7 @@ namespace susu_tools{
 
 class susu_http_processer{
 public:
-	susu_http_processer(int event_counts_limit);
+	susu_http_processer(int event_counts_limit,string script_path);
 
 	// functions work with epoll
 	int get_current_fd_count();
@@ -42,7 +42,11 @@ public:
 	int get_epoll_result(int ms_count);
 
 	int process_fd(int count);
+
+	int load_script_list(const char* str);
+
 private:
+	susu_cache	script_list;	//to store the script can be used.
 	susu_epoll*	epoll_manager;
 	susu_http_reader	reader;
 	susu_http_writer	writer;

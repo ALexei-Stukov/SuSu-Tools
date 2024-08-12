@@ -2,32 +2,32 @@
 
 namespace susu_tools{
 
-susu_initparam* susu_initparam_handle = NULL;
-susu_initparam* susu_initparam::get_Init_Param_instance()
+susu_init_param* susu_init_param_handle = NULL;
+susu_init_param* susu_init_param::get_Init_Param_instance()
 {
-	if(susu_initparam_handle == NULL)
+	if(susu_init_param_handle == NULL)
 	{
 		init_mutex.lock();
-		if(susu_initparam_handle == NULL)
+		if(susu_init_param_handle == NULL)
 		{
-			susu_initparam_handle = new susu_initparam();
+			susu_init_param_handle = new susu_init_param();
 		}
 		init_mutex.unlock();
 	}
-	return susu_initparam_handle;
+	return susu_init_param_handle;
 }
 
-::std::mutex susu_initparam::init_mutex;
+::std::mutex susu_init_param::init_mutex;
 
 
-susu_initparam::susu_initparam()
+susu_init_param::susu_init_param()
 {
 }
-susu_initparam::~susu_initparam()
+susu_init_param::~susu_init_param()
 {
 }
 
-int susu_initparam::load_init_param(const char* str)  //加载参数
+int susu_init_param::load_init_param(const char* str)  //加载参数
 {
 	try{
 		//open the target file
@@ -93,7 +93,7 @@ int susu_initparam::load_init_param(const char* str)  //加载参数
 	return 0;
 }
 
-string susu_initparam::get_value(string key)
+string susu_init_param::get_value(string key)
 {
 	if(init_param.find(key) == SUCCESS)
 	{
@@ -105,7 +105,7 @@ string susu_initparam::get_value(string key)
 	}
 };
 
-void susu_initparam::init_param_print()
+void susu_init_param::init_param_print()
 {
 	auto ins = init_param.get_data_store();
 	

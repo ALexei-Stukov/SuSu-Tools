@@ -21,7 +21,7 @@ int main(int argc,char** argv)
     }
 
     //get the params
-    auto ins = susu_initparam::get_Init_Param_instance();
+    auto ins = susu_init_param::get_Init_Param_instance();
 
     cout<<"load param file:"<<argv[1]<<endl;
     ins->load_init_param(argv[1]);
@@ -53,7 +53,7 @@ int main(int argc,char** argv)
     for(int i=0;i<stoi(ins->get_value("thread_init_count"));i++)
     {
         //新建一个epoll对象,每个对象最多管理 Init_Param.epoll_count 个socket
-        susu_http_processer* hp = new susu_http_processer(stoi(ins->get_value("epoll_count")));
+        susu_http_processer* hp = new susu_http_processer(stoi(ins->get_value("epoll_count")),ins->get_value("script_config"));
         //把对象的loop函数作为可执行的task添加到线程池
         tp->add_task(susu_tools::http_work,hp);
         //由于load_balace的设计，每个task都独占1个线程
@@ -75,19 +75,15 @@ int main(int argc,char** argv)
     	if (client_socket != -1)
     	{
 			//主线程将把fd分给 "最空闲"的 http-processer。由于processer内部有一个循环，且一个processer和一个线程绑定，所以最终，也可以认为主线程把fd交给了最空闲、算力最充裕的线程。
-			printf("the target_index = %d\n",target_index);	
 			http_processer_vector[target_index]->add_an_event(client_socket);
-			target_index ++;
-			target_index %= stoi(ins->get_value("thread_init_count"));
-			printf("the target_index = %d\n",target_index);	
-			/*for(int index = 0;index < http_processer_vector.size();index++)
+			for(int index = 0;index < http_processer_vector.size();index++)
 			{
 				if(http_processer_vector[index]->get_current_fd_count() < min_fd_counts)
 				{
 					min_fd_counts = http_processer_vector[index]->get_current_fd_count();
 					target_index = index;
 				}
-			}*/
+			}
     	}
 	}
 	

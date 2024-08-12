@@ -71,6 +71,10 @@ int susu_http_reader::fd_read(char * buffer,size_t n)
 		return -1;
 	}
 }*/
+susu_cache& susu_http_reader::get_kv_store()
+{
+	return head;
+}
 
 int susu_http_reader::get_http_head(int fd)
 {
