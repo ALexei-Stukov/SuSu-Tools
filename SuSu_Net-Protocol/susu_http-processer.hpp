@@ -14,6 +14,7 @@
 using std::string;
 using std::queue;
 
+#include "susu_init-param.hpp"
 #include "susu_cache.hpp"
 #include "susu_epoll.hpp"
 #include "susu_http-reader.hpp"

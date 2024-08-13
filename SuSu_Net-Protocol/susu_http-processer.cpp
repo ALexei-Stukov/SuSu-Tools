@@ -57,8 +57,19 @@ int susu_http_processer::process_fd(int count)
 			}
 			else
 			{
-				reader.analyse(client_socket);	//获得HTTP请求信息，存储在reader内。
-				//根据不同情况，调用不同的函数，产生不同的结果。
+				if( reader.analyse(client_socket) == -1)	//获得HTTP请求信息，存储在reader内。根据不同情况，调用不同的函数，产生不同的结果。
+				{
+					//通过简单的检查，发现不是http包的情形
+					remove_an_event(client_socket);
+					continue;
+				}
+
+				/*调用逻辑：
+					1.Method = GET，调用GET.lua
+					2.Method = POST，调用POST.lua
+
+					方法头的处理在httpd内进行，方法头将决定如何调用脚本
+				*/
 				if( reader.get_kv_store().find("Method") == SUCCESS )
 				{
 					//以管道形式调用脚本，并接收参数
@@ -66,17 +77,36 @@ int susu_http_processer::process_fd(int count)
 					FILE *fp;//文件流
 
 					char exe_cmd[2048];//待执行的命令
-   					//sprintf(exe_cmd,"lua %s/%s %s/%s %s\0",init_param->get_string_value("root_path").c_str(),script_name,init_param->get_string_value("root_path").c_str(),filename,type);
-    				
-					/*
-					string SCRIPT = *(script_list.get<string>("Method"));
-					string ROOT_PATH = ".";	//临时这么弄一下先
-					string FILENAME = "index.html";
-					string TYPE = "/index.html";					
-					sprintf(exe_cmd,"lua ./%s %s/%s %s\0",SCRIPT.c_str(),ROOT_PATH.c_str(),FILENAME.c_str(),TYPE.c_str());
-					*/
-					sprintf(exe_cmd,"lua ./get-test.lua ./index.html /*.html\0");
-					printf("WDNMD\n");
+
+					auto ins = susu_init_param::get_Init_Param_instance();	//获得httpd的启动参数管理器
+					string ROOT_PATH = ins->get_value("root_path");	//获得root_path的位置
+
+					string METHOD = *(reader.get_kv_store().get<string>("Method"));	//查看请求的Method字段
+					string SCRIPT;	//待执行的脚本名称
+					if(script_list.find(METHOD) == SUCCESS)	//检查该字段是否在script列表内
+					{
+						SCRIPT = *(reader.get_kv_store().get<string>("Method"))+".lua";	//本httpd默认使用lua脚本，由于httpd只负责转发操作，所以修改起来是很方便的。
+					}
+					else
+					{
+						SCRIPT = *(reader.get_kv_store().get<string>("undefined"))+".lua";
+					}
+					SCRIPT = ROOT_PATH + "/" + SCRIPT;
+					//std::cout<<"the SCRIPT is"<<SCRIPT<<std::endl;
+
+					string URL = *(reader.get_kv_store().get<string>("Url"));	//看看客户端想要的文件名
+					if (URL == "/")
+					{
+						URL = "/index.html";
+					}
+					URL = ROOT_PATH + URL;
+					//std::cout<<"the UTL is"<<URL<<std::endl;
+					
+					string ACCEPT =*(reader.get_kv_store().get<string>("Accept"));	//看看客户端接受哪些文件类型
+					
+					sprintf(exe_cmd,"lua %s %s %s\0",SCRIPT.c_str(),URL.c_str(),ACCEPT.c_str());
+					//printf("%s\n",exe_cmd);
+
 					fp = popen(exe_cmd,"r");
 					int size = fread(ret,1,1024,fp);
 					while(size > 0)
@@ -85,7 +115,7 @@ int susu_http_processer::process_fd(int count)
         				//printf("%s",ret);
         				size = fread(ret,1,1024,fp);
     				}
-   					pclose(fp);				
+   					pclose(fp);							
 				}
 			}
         }

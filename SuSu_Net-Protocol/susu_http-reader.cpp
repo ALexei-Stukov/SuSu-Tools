@@ -12,7 +12,6 @@ int susu_http_reader::analyse(int fd)
 	{
 		return -1;
 	}
-	cout<<"1"<<endl;
 		
 	while( get_a_http_line(fd) )	//不断读取http行
 	{
@@ -35,7 +34,6 @@ int susu_http_reader::analyse(int fd)
 		value = line.substr(pos+2,line.length());
 		head.add(key,value);
 	}
-	cout<<"2"<<endl;
 	auto ins = head.get_data_store();
 	for(auto it = ins.begin();it != ins.end();it++)
 	{
@@ -107,6 +105,15 @@ int susu_http_reader::get_http_head(int fd)
 	string Method(METHOD);
 	string Url(URL);
 	string Version(VERSION);
+
+	//检查Version字符串内是否存在HTTP的字样，且不存在HTTPS的字样
+	size_t pos_http = Version.find("HTTP");
+	size_t pos_https = Version.find("HTTPS");
+	if(pos_https != string::npos || pos_http == string::npos)
+	{
+		//包不合规，不作处理。
+		return -1;
+	}
 
 	head.add("Method",Method);
 	head.add("Url",Url);
