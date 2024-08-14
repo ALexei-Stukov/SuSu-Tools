@@ -50,19 +50,32 @@ public:
 		this->result_limit = result_limit;
 	};
 	template<class F, class... Args>
-	auto enqueue(F&& func, Args&&...args) -> future< typename result_of<F(Args...)>::type >
+	int enqueue(F&& func, Args&&...args)
+	{
+		using return_type = typename result_of<F(Args...)>::type;	//check the return type of F(Args)
+		
+		// bind the function and params ，build a packaged_task. so that (*task)(); = f(args);
+		auto task = make_shared< packaged_task<return_type()> >( bind( forward<F>(func),forward<Args>(args)...) );
+  
+    	// add thie task to task_queue
+    	task_queue.emplace([task](){ (*task)(); });
+
+   		return 0;
+	}
+
+	template<class F, class... Args>
+	auto enqueue_future(F&& func, Args&&...args) -> future< typename result_of<F(Args...)>::type >
 	{
 		using return_type = typename result_of<F(Args...)>::type;	//check the return type of F(Args)
 		
 		// bind the function and params ，build a packaged_task. so that (*task)(); = f(args);
 		auto task = make_shared< packaged_task<return_type()> >( bind( forward<F>(func),forward<Args>(args)...) );
 
-    		// get this task's future，  
-    		future<return_type> res = task->get_future();
-    		//future<int> res = task->get_future();
+    	// get this task's future，  
+    	future<return_type> res = task->get_future();
   
-    		// add thie task to task_queue
-    		task_queue.emplace([task](){ (*task)(); });
+    	// add thie task to task_queue
+    	task_queue.emplace([task](){ (*task)(); });
 		
 		// add the future to resule queue
 		result_queue.push(move(res));	//can't use copy construct,we must use move()
@@ -89,6 +102,24 @@ public:
 		}
 	}
 
+	template<class F, class... Args>
+	int add_a_task_future(F&& func, Args&&...args)
+	{
+
+		if(task_queue.size() > task_limit)
+		{
+			return SUSU_OUT_OF_TASK_LIMIT;
+		}
+		else if(result_queue.size() > result_limit) 
+		{
+			return SUSU_OUT_OF_RESULT_LIMIT;
+		}
+		else
+		{
+    		enqueue_future( forward<F>(func), forward<Args>(args)...);
+    		return task_queue.size();	//return the current task count;
+		}
+	}
     	
 	void execute_a_task()
     {
@@ -142,7 +173,7 @@ public:
 					FUTURE_RET ret = {0,SUSU_FUTURE_DEFERRED};
 					return ret;
 				}
-            			case future_status::ready:
+            	case future_status::ready:
 				{
 					int result = future.get();
 					result_queue.pop();
@@ -167,6 +198,21 @@ public:
 	{
 		return result_queue.size();
 	}
+
+	int clear_task_queue()
+	{
+		queue< function<void()> > empty;
+		swap(task_queue,empty);
+		return 0;
+	}
+
+	int clear_result_queue()
+	{
+		queue< future<int> > empty;
+		swap(result_queue,empty);
+		return 0;
+	}
+
 
 
 private:

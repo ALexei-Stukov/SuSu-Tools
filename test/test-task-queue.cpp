@@ -21,7 +21,7 @@ int main()
 
 	for(int i = 0; i < 20;i++)
 	{
-		int add = t.add_a_task(funny,i);
+		int add = t.add_a_task_future(funny,i);
 		if( add != SUSU_OUT_OF_TASK_LIMIT || add != SUSU_OUT_OF_RESULT_LIMIT)
 		{
 			printf("insert successfully\n");
