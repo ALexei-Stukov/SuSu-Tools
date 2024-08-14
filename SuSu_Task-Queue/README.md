@@ -1,6 +1,6 @@
-## Short describe about this task queue
-
 [Introduction of SuSu-Tools](../README.md)
+
+## Short describe about this task queue
 
 SuSu_Task-Queue is a **very useful tool**,expecially in multi-thread environment.
 
