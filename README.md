@@ -98,6 +98,8 @@ If you wan to **use the tools**, just check the **example folder** or the **test
 
 ![summary_of_SuSu_Httpd](./summary_of_SuSu_Httpd.png)
 
+![details of socket assign](./details of socket assign.png)
+
 road map is made by **excalidraw**.
 
 [click here to get more message](https://excalidraw.com/)
