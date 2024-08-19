@@ -66,12 +66,25 @@ int main(int argc,char** argv)
     socklen_t client_addr_size = sizeof(client_addr);
 	int client_socket = -1;
 
+	//设置收发超时时间
+	struct timeval timeout;
+	timeout.tv_sec = 0;//设置超时时间为100ms秒
+	timeout.tv_usec = 1000*100;
+
 	int target_index = 0;	//即将要添加fd的processer编号
 	int min_fd_counts = 1024*1024*1024;	//最空闲的http-process有多少个fd
 	while(true)
 	{
     	client_socket = accept(server->get_fd(),(struct sockaddr *)&client_addr,&client_addr_size);
 		printf("received a client socket:%d\n",client_socket);
+		
+		//设置和客户端通讯的fd在recv时只监听100ms,超时则返回错误。
+	    if (setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1)
+	    {
+		    printf("Setsockopt failed\n");
+			continue;
+	    }
+
     	if (client_socket != -1)
     	{
 			//主线程将把fd分给 "最空闲"的 http-processer。由于processer内部有一个循环，且一个processer和一个线程绑定，所以最终，也可以认为主线程把fd交给了最空闲、算力最充裕的线程。

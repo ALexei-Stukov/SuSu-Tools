@@ -5,6 +5,44 @@ using namespace susu_tools;
 using std::cout;
 using std::endl;
 
+/*
+	关键点：
+		\r\n作为一行，每行的长度都不能超过预设上限
+		如果超过预设上限还没有读到\r\n，返回分析失败。
+		
+		仅阻塞很短一段时间，超时没有读到就返回分析失败。
+			--tcp_object已经决定了这一点，不过还得再测试一下。
+*/
+int susu_http_reader::get_a_http_line(int fd)
+{
+
+	//显然，令fd的recv可以超时，这一操作直接让设计简明了一大半。
+	char ch = '\0';
+	int numchars;
+	int length = 0;
+	for(int length = 0 ;length < line_length_limit;length++)
+	{
+		//遇到\r\n结尾则直接终止并退出
+		if(length > 2 && (buffer[length-2] == '\r') && (buffer[length-1] == '\n'))
+		{
+			buffer[length] = '\0';
+			return length;
+		}
+
+		numchars = recv(fd, &ch, 1, 0);
+		if (numchars > 0)
+		{
+			buffer[length] = ch;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	//超出字符串长度限制也直接退出
+	return -1;
+}
+
 int susu_http_reader::analyse(int fd)
 {
 	head.remove_all();		//clean old data
@@ -13,7 +51,7 @@ int susu_http_reader::analyse(int fd)
 		return -1;
 	}
 		
-	while( get_a_http_line(fd) )	//不断读取http行
+	while( get_a_http_line(fd) > 0 )	//不断读取http行
 	{
 		if( check_all_space(buffer) )	//遇到空行结束，空行即 "\r\n" 这种形式
 		{
@@ -94,7 +132,6 @@ int susu_http_reader::get_http_head(int fd)
 		return -1;
 	}
 
-
 	//get the method,url,version from buffer
 	char METHOD[line_length_limit];
 	char URL[line_length_limit];
@@ -120,53 +157,6 @@ int susu_http_reader::get_http_head(int fd)
 	head.add("Version",Version);
 
 	return 0;
-}
-
-int susu_http_reader::get_a_http_line(int fd)
-{
-	int length = 0;
-	char ch = '\0';
-	int numchars;
-	while ( length < line_length_limit - 3 && ch != '\n'  )	//
-	{
-		numchars = recv(fd, &ch, 1, 0);
-		if (numchars > 0)
-		{
-			buffer[length] = ch;
-			length++;
-
-			if (ch == '\r')  //check if the line is end 
-			{
-				numchars = recv(fd, &ch, 1, MSG_PEEK);	// use MSG_PEEK to check what is the next char in fd, this operation will not affect the data in fd.
-														// if the next char is '\n',then we read it ,and the line is end.
-														// if the next char not '\n',do nothing.
-				
-				if ((numchars > 0) && (ch == '\n'))
-				{
-					recv(fd, &ch, 1, 0);
-					buffer[length] = ch;
-					length++;
-					break;
-				}
-			}
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	//make sure the line is end with "\r\n"
-	if(buffer[length-2] != '\r' && buffer[length-1] != '\n')
-	{
-		buffer[length] = '\r';
-		length++;
-		buffer[length] = '\n';
-		length++;
-	}
-	buffer[length] = '\0';
-
-   	return length;
 }
 
 bool susu_http_reader::check_all_space(char* str) //check if all the char is space

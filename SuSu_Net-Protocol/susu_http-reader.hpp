@@ -15,7 +15,7 @@ using std::string;
 #include "susu_cache.hpp"
 //#include "susu_initparam.hpp"
 
-#define line_length_limit 4096
+#define line_length_limit 4096+1
 
 namespace susu_tools{
 

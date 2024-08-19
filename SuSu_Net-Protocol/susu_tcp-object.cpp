@@ -176,7 +176,7 @@ int susu_tcp_object::server_listen_the_port()
 		{
 			throw "socket listen failed\n";
 		}
-    
+
         fd = socket_fd;   //store the fd into tcp object
 	    return socket_fd;
 	}
