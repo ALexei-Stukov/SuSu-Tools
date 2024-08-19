@@ -27,11 +27,7 @@ The project includes the following tools:
 
 [Init-Param](./SuSu_Init-Param/README.md): A easy way to manager the Init params.
 
-[Thread-Pool](./SuSu_Thread-Pool/README.md): A thread pool supports asynchronous(
-```cpp
-#include <future> 
-```
-).
+[Thread-Pool](./SuSu_Thread-Pool/README.md): A thread pool supports asynchronous(```#include <future>```).
 
 [Net-Protocol](./SuSu_Net-Protocol/README.md): Some tools in net.
 
