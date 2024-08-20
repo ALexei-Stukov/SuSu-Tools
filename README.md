@@ -75,17 +75,16 @@ int main()
 
 Different tool has README,read the README can help you how to use SuSu_Tools.
 
-The tests in **./test/** also good example for beginners.
+The test programs are also good example for beginners.You can get more infomation in **./test/**.
 
 ## Httpd
 ```
 sudo apt install lua5.3     # Lua is the default script in susu_httpd,But you can change it to other script.
-make HTTPD          # the http service
-make RUN-HTTPD            # run the http service
+make test-httpd          # build and run the http service
 ```
-Then open **127.0.0.1:9512** in browser to view the default web page.
+Then open **127.0.0.1:9527** in browser to view the default web page.If everything goes well,you will see the default index.
 
-**9512** is the **default port**, you can change the port to **80** or **8080** in the **config file**.
+**9527** is the **default port**, you can change the port to **80** or **8080** in the **config file**.
 
 ## the tools
 If you wan to **use the tools**, just check the **example folder** or the **test folder**.
@@ -102,6 +101,6 @@ If you wan to **use the tools**, just check the **example folder** or the **test
 
 ![summary_of_http_process](./summary_of_http_process.png)
 
-road map is made by **excalidraw**.
+road map is made by **excalidraw**.click here to get more message:
 
-[click here to get more message](https://excalidraw.com/)
+![excalidraw](https://excalidraw.com/)
