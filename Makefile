@@ -128,13 +128,13 @@ clean:
 ifeq ($(shell ls "$(BIN)"),)
 	@echo $(BIN) is empty
 else
-	rm -r $(BIN)/*
+	rm -r $(BIN)*
 endif
 
 ifeq ($(shell ls "$(TEMP)"),)
-	@echo $(BIN) is empty
+	@echo $(TEMP) is empty
 else
-	rm -r $(BIN)/*
+	rm -r $(TEMP)*
 endif
 
 #ifeq ($(ls $(BIN)),)

@@ -104,7 +104,7 @@ int susu_http_processer::process_fd(int count)
 					
 					string ACCEPT =*(reader.get_kv_store().get<string>("Accept"));	//看看客户端接受哪些文件类型
 					
-					sprintf(exe_cmd,"lua %s %s %s\0",SCRIPT.c_str(),URL.c_str(),ACCEPT.c_str());
+					sprintf(exe_cmd,"lua %s %s %s\0",SCRIPT.c_str(),URL.c_str(),ACCEPT.c_str());	//调用对应的script
 					//printf("%s\n",exe_cmd);
 
 					fp = popen(exe_cmd,"r");
